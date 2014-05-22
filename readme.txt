@@ -1,10 +1,10 @@
 ﻿
-String.format for JavaScript {version}
+String.format for JavaScript 1.09
 mstr.se/sffjs
 
-Built: {date}
+Built: 2014-01-26T13:12:33Z
 
-Copyright (c) 2009-{year} Daniel Mester Pirttijärvi
+Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
 
 
 DESCRIPTION
@@ -18,8 +18,8 @@ FILES
 
 You got a number of files when you extracted the script library:
 
-stringformat-{version}.min.js    - Compressed and obfuscated, to be used in production.
-stringformat-{version}.js        - Commented source file for your reference.
+stringformat-1.09.min.js    - Compressed and obfuscated, to be used in production.
+stringformat-1.09.js        - Commented source file for your reference.
 tests.html                  - Test page that performs unit tests on the library.
 stringformat.tests.js       - Script for tests.html.
 cultures/stringformat.XX.js - Files holding metadata about cultures.
@@ -32,7 +32,7 @@ are targetting. Note that if no culture files are included, the invariant
 culture will be used.
 
     [CODE]
-    <script type="text/javascript" src="stringformat-{version}.min.js"></script>
+    <script type="text/javascript" src="stringformat-1.09.min.js"></script>
     <script type="text/javascript" src="cultures/stringformat.en.js"></script>
     <script type="text/javascript" src="cultures/stringformat.sv.js"></script>
 

@@ -2,9 +2,9 @@
 ---------------------------------------------------------------------------
 
 String.format for JavaScript
-Copyright (c) 2009-{year} Daniel Mester Pirttijärvi
+Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
 
-The library core (stringformat-{version}.js and stringformat-{version}.min.js) is 
+The library core (stringformat-1.09.js and stringformat-1.09.min.js) is 
 licensed under the terms of the zlib license. 
 
                                  * * *

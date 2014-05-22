@@ -1,10 +1,10 @@
 ﻿/**
- * String.format for JavaScript {version}
+ * String.format for JavaScript 1.09
  * mstr.se/sffjs
  *  
- * Built: {date}
+ * Built: 2014-01-26T13:12:33Z
  *
- * Copyright (c) 2009-{year} Daniel Mester Pirttijärvi
+ * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -31,7 +31,7 @@ var sffjs = (function() {
     // ***** Public Interface *****
     var sffjs = {
             /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-            version: "{version}",
+            version: "1.09",
             
             setCulture: function (languageCode) {
                 /// <summary>
