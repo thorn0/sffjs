@@ -80,7 +80,7 @@
 
         // Holds the id of the current culture. The id is also included in the culture object, but the
         // culture object might be replaced during runtime when a better matching culture is registered.
-        currentCultureId = navigator.systemLanguage || navigator.language || "",
+        currentCultureId = typeof navigator !== 'undefined' && (navigator.systemLanguage || navigator.language) || "",
 
         // Holds all registered external cultures, i.e. not the invariant culture
         cultures = {};
