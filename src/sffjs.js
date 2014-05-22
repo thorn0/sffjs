@@ -23,9 +23,24 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
-/* exported sffjs */
-var sffjs = (function() {
+/* global sffjs:true, module, define */
+(function(factory) {
 
+    if (typeof module !== 'undefined' && module.exports) {
+        // CommonJS
+        module.exports = factory();
+    } else if (typeof define === "function" && define.amd) {
+        // AMD
+        define(factory);
+    } else {
+        sffjs = factory();
+        if (this.sffjs === sffjs) {
+            // it's global
+            sffjs.unsafe();
+        }
+    }
+
+}).call(this, function() {
     var sffjs,
 
     // ***** Shortcuts *****
@@ -90,9 +105,8 @@ var sffjs = (function() {
         return isNaN(value1) ? value2 : value1;
     }
 
-    function isDate(input) {
-        return Object.prototype.toString.call(input) === '[object Date]' ||
-            input instanceof Date;
+    function isDate(value) {
+        return Object.prototype.toString.call(value) === '[object Date]' || value instanceof Date;
     }
 
     // Culture functions
@@ -750,7 +764,7 @@ var sffjs = (function() {
         });
     };
 
-    function unsafe() {
+    sffjs.unsafe = function() {
         /// <summary>
         ///     Unsafe modifications of native objects
         /// </summary>
@@ -769,10 +783,7 @@ var sffjs = (function() {
         for (var i = 0; i < formattables.length; i++) {
             formattables[i].format = formattables[i].format || formattables[i].__Format;
         }
-    }
-
-    // skip it for now
-    // unsafe();
+    };
 
     // ***** Public Interface *****
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
@@ -799,10 +810,8 @@ var sffjs = (function() {
         updateCulture();
     };
 
-    sffjs.unsafe = unsafe;
-
     // Initiate culture
     updateCulture();
 
     return sffjs;
-})();
+});
