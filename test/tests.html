@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- 
-    Unit tests for 
+<!--
+    Unit tests for
     String.format for JavaScript 1.09
-    
+
     mstr.se/sffjs
-     
+
     Built: 2014-01-26T13:12:33Z
 
     Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
@@ -31,104 +31,103 @@
 <head>
     <title>Unit testning String.format for JavaScript</title>
     <style type="text/css">
-    
+
         body {
             font: 0.75em Aial, sans-serif;
         }
-        
+
         div.pass, div.fail {
             font-size: 1.5em;
         }
-        
+
         div.pass em, div.fail em {
             font-size: 1.2em;
             font-weight: bold;
             font-style: normal;
         }
-        
+
         div.pass {
             color: green;
         }
-        
+
         div.fail {
             color: red;
         }
-        
+
         .progress {
             height: 10px;
             background: red;
         }
-        
+
         .progress span {
             display: block;
             height: 10px;
             background: green;
             border-right: 1px solid white;
         }
-        
+
         table {
             border-collapse: collapse;
         }
-        
+
         td {
             padding: 0.4em 1.5em;
         }
-        
+
         th {
             text-align: left;
             font-weight: bold;
             padding-top: 1em;
         }
-        
+
         td.pass {
             font-weight: bold;
             background: green;
             color: white;
             text-align: center;
         }
-        
+
         td.fail {
             font-weight: bold;
             background: red;
             color: white;
             text-align: center;
         }
-        
+
         td.message {
             white-space: pre-wrap;
             font: 1em Consolas, monospace;
         }
-        
+
         tr {
             border-top: 2px solid white;
             border-bottom: 2px solid white;
         }
-        
+
         tr:nth-child(odd) {
             background: #fcfcfc;
         }
-        
+
         tr:nth-child(even) {
             background: #fafafa;
         }
-        
+
         tr:hover {
             background: #eee;
         }
-        
+
         td.error {
             color: red;
         }
-    
+
     </style>
 </head>
 <body>
 
-<script type="text/javascript" src="stringformat.js"></script>
-<script type="text/javascript" src="stringformat-1.09.min.js"></script>
-<script type="text/javascript" src="cultures/stringformat.en-US.js"></script>
-<script type="text/javascript" src="cultures/stringformat.sv.js"></script>
-<script type="text/javascript" src="stringformat.tests.js"></script>
+<script type="text/javascript" src="../src/sffjs.js"></script>
+<script type="text/javascript" src="../src/cultures/stringformat.en-US.js"></script>
+<script type="text/javascript" src="../src/cultures/stringformat.sv.js"></script>
+<script type="text/javascript" src="tests.js"></script>
 
 </body>
 </html>
