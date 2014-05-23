@@ -1,9 +1,11 @@
 ﻿
 String.format for JavaScript
-mstr.se/sffjs
 
 Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+http://mstr.se/sffjs
 
+Fork by Georgii Dolzhykov
+http://github.com/thorn0/sffjs
 
 DESCRIPTION
 
