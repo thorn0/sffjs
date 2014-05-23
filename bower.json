@@ -1,0 +1,29 @@
+{
+  "name": "sffjs",
+  "version": "1.10.0-alpha",
+  "homepage": "https://github.com/thorn0/sffjs",
+  "authors": [
+    "Daniel Mester Pirttijarvi",
+    "Georgii Dolzhykov"
+  ],
+  "description": "String.Format for JavaScript",
+  "main": "src/sffjs.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "dotnet",
+    ".net",
+    "string.format"
+  ],
+  "license": "zlib",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
