@@ -1,8 +1,11 @@
 ﻿/**
  * String.format for JavaScript
- * mstr.se/sffjs
  *
  * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+ * http://mstr.se/sffjs
+ *
+ * Fork by Georgii Dolzhykov
+ * http://github.com/thorn0/sffjs
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -33,26 +36,18 @@
         // AMD
         define(factory);
     } else {
+        // global
         sffjs = factory();
-        if (this.sffjs === sffjs) {
-            // it's global
-            sffjs.unsafe();
-        }
+        sffjs.unsafe();
     }
 
 }).call(this, function() {
-    var sffjs,
-
-    // ***** Shortcuts *****
-        _Number = Number,
-        zero = "0",
-        toUpperCase = "toUpperCase",
 
     // ***** Private Variables *****
 
         // This is the default values of a culture. Any missing format will default to the format in CULTURE_TEMPLATE.
         // The invariant culture is generated from these default values.
-        CULTURE_TEMPLATE = {
+    var CULTURE_TEMPLATE = {
             name: "", // Empty on invariant culture
             d: "MM/dd/yyyy",
             D: "dddd, dd MMMM yyyy",
@@ -92,7 +87,7 @@
 
     function numberPair(n) {
         /// <summary>Converts a number to a string that is at least 2 digit in length. A leading zero is inserted as padding if necessary.</summary>
-        return n < 10 ? zero + n : n;
+        return n < 10 ? "0" + n : n;
     }
 
     function hasValue(value) {
@@ -186,7 +181,7 @@
 
             // Evaluate path until we reach the searched member or the value is undefined/null
             while (hasValue(value) && (match = followingMembers.exec(path))) {
-                value = value[match[2] || _Number(match[3])];
+                value = value[match[2] || Number(match[3])];
             }
         }
 
@@ -267,7 +262,7 @@
         }
 
         // Add padding (if necessary)
-        align = _Number(align) || 0;
+        align = Number(align) || 0;
 
         paddingLength = Math.abs(align) - value.length;
 
@@ -306,7 +301,7 @@
         // Pad integrals with zeroes to reach the minimum number of integral digits
         minIntegralDigits -= integralDigits;
         while (minIntegralDigits-- > 0) {
-            groupedAppend(out, zero);
+            groupedAppend(out, "0");
         }
 
         // Add integral digits
@@ -321,7 +316,7 @@
             // Pad with zeroes
             minDecimalDigits -= decimalDigits;
             while (minDecimalDigits-- > 0) {
-                groupedAppend(out, zero);
+                groupedAppend(out, "0");
             }
         }
 
@@ -370,10 +365,10 @@
             } else {
 
                 // Only 0 and # are digit placeholders, skip other characters in analyzing phase
-                if (c == zero || c == "#") {
+                if (c == "0" || c == "#") {
                     decimals += atDecimals;
 
-                    if (c == zero) {
+                    if (c == "0") {
                         // 0 is a forced digit
                         if (atDecimals) {
                             forcedDecimals = decimals;
@@ -433,7 +428,7 @@
                 f++;
 
             // Digit placeholder
-            } else if (c == "#" || c == zero) {
+            } else if (c == "#" || c == "0") {
                 if (i < integralDigits) {
                     // In the integral part
                     if (i >= 0) {
@@ -444,14 +439,14 @@
 
                         // Not yet inside the number number, force a zero?
                     } else if (i >= integralDigits - forcedDigits) {
-                        groupedAppend(out, zero);
+                        groupedAppend(out, "0");
                     }
 
                     unused = 0;
 
                 } else if (forcedDecimals-- > 0 || i < number.length) {
                     // In the fractional part
-                    groupedAppend(out, i >= number.length ? zero : number.charAt(i));
+                    groupedAppend(out, i >= number.length ? "0" : number.charAt(i));
                 }
 
                 i++;
@@ -482,7 +477,7 @@
         var radixPoint = currentCulture._r,
             thousandSeparator = currentCulture._t;
 
-        number = _Number(number);
+        number = Number(number);
 
         // If not finite, i.e. ±Intifity and NaN, return the default JavaScript string notation
         if (!isFinite(number)) {
@@ -490,7 +485,7 @@
         }
 
         // Default formatting if no format string is specified
-        if (!format && format !== zero) {
+        if (!format && format !== "0") {
             return basicNumberFormatter(number, 0, 0, 10, radixPoint);
         }
 
@@ -616,7 +611,7 @@
                     // Add padding, remember precision might be NaN
                     precision -= result.length;
                     while (precision-- > 0) {
-                        result = zero + result;
+                        result = "0" + result;
                     }
 
                     return result;
@@ -730,7 +725,8 @@
         );
     }
 
-    sffjs = function(str, obj0, obj1, obj2) {
+    // ***** Public Interface *****
+    function sffjs(str, obj0, obj1, obj2) {
         /// <summary>
         ///     Formats a string according to a specified formatting string.
         /// </summary>
@@ -762,13 +758,13 @@
                 processFormatItem(innerArgs[3], innerArgs[4], innerArgs[5], outerArgs) +
                 unescapeBraces(innerArgs[6], 1);
         });
-    };
+    }
 
     sffjs.unsafe = function() {
         /// <summary>
         ///     Unsafe modifications of native objects
         /// </summary>
-        _Number.prototype.__Format = function(format) {
+        Number.prototype.__Format = function(format) {
             return mainNumberFormatter(this, format);
         };
 
@@ -779,13 +775,12 @@
         String.__Format = sffjs;
 
         // If a format method has not already been defined on the following objects, set __Format as format.
-        var formattables = [Date.prototype, _Number.prototype, String];
+        var formattables = [Date.prototype, Number.prototype, String];
         for (var i = 0; i < formattables.length; i++) {
             formattables[i].format = formattables[i].format || formattables[i].__Format;
         }
     };
 
-    // ***** Public Interface *****
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
     sffjs.version = "1.09";
 
@@ -804,7 +799,7 @@
         ///     Registers an object containing information about a culture.
         /// </summary>
 
-        cultures[culture.name[toUpperCase]()] = fillGapsInCulture(culture);
+        cultures[culture.name.toUpperCase()] = fillGapsInCulture(culture);
 
         // ...and reevaulate current culture
         updateCulture();
