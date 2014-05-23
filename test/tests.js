@@ -1,11 +1,12 @@
-﻿/**
+/**
  * Unit tests for
- * String.format for JavaScript 1.09
- * mstr.se/sffjs
- *
- * Built: 2014-01-26T13:12:33Z
+ * String.format for JavaScript
  *
  * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+ * http://mstr.se/sffjs
+ *
+ * Fork by Georgii Dolzhykov
+ * http://github.com/thorn0/sffjs
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -93,6 +94,7 @@
 
         var dtam = new Date(1989, 3, 2, 6, 20, 33);
         var dtpm = new Date(1989, 3, 2, 18, 20, 33);
+        var dt2009 = new Date(2009, 3, 2, 18, 20, 33);
 
         test.section("Date/time no formatting");
         assert.formatsTo("04/02/1989 06:20:33", "{0}", dtam);
@@ -147,6 +149,9 @@
 
         assert.formatsTo("Apr", "{0:MMM}", dtpm);
         assert.formatsTo("April", "{0:MMMM}", dtpm);
+
+        assert.formatsTo("2009", "{0:yyyy}", dt2009);
+        assert.formatsTo("09", "{0:yy}", dt2009);
 
         test.section("Special numeric values");
         assert.formatsTo("NaN", "{0}", NaN);
@@ -300,6 +305,12 @@
         assert.formatsTo("april 1989", "{0:y}", dtpm);
 
         assert.formatsTo("1.555,48 kr", "{0:c}", 1555.475);
+
+        test.section("Culture uk-UA");
+        sffjs.setCulture("uk-UA");
+        assert.formatsTo("02.04.1989", "{0:d}", dtam);
+        assert.formatsTo("2 Кві", "{0:d MMM}", dtam);
+        assert.formatsTo("2 квітня", "{0:d MMMM}", dtam);
 
         test.section("Date/time standard (en-US)");
         sffjs.setCulture("en-US");
