@@ -27,6 +27,7 @@
  *
  */
 /* global sffjs:true, module, define */
+/* jshint curly:false, eqeqeq:true */
 (function(factory) {
 
     if (typeof module !== 'undefined' && module.exports) {
@@ -206,7 +207,7 @@
             out.push(value.charAt(i));
 
             // Begin a new group?
-            if (out.g > 1 && out.g-- % 3 == 1) {
+            if (out.g > 1 && out.g-- % 3 === 1) {
                 out.push(out.t);
             }
         }
@@ -252,7 +253,7 @@
         } else if (value.__Format) {
             // If the object has a custom format method, use it
             value = value.__Format(formatString);
-        } else if (typeof value == 'number') {
+        } else if (typeof value === 'number') {
             value = mainNumberFormatter(value, formatString);
         } else if (isDate(value)) {
             value = mainDateFormatter(value, formatString);
@@ -349,7 +350,7 @@
             c = format.charAt(i);
 
             // Check if we have reached a literal
-            if (c == "'" || c == '"') {
+            if (c === "'" || c === '"') {
 
                 // Search for end of literal
                 i = format.indexOf(c, i + 1);
@@ -359,16 +360,16 @@
                 if (i < 0) break;
 
             // Check for single escaped character
-            } else if (c == "\\") {
+            } else if (c === "\\") {
                 i++;
 
             } else {
 
                 // Only 0 and # are digit placeholders, skip other characters in analyzing phase
-                if (c == "0" || c == "#") {
+                if (c === "0" || c === "#") {
                     decimals += atDecimals;
 
-                    if (c == "0") {
+                    if (c === "0") {
                         // 0 is a forced digit
                         if (atDecimals) {
                             forcedDecimals = decimals;
@@ -381,7 +382,7 @@
                 }
 
                 // If the current character is ".", then we have reached the end of the integral part
-                atDecimals = atDecimals || c == ".";
+                atDecimals = atDecimals || c === ".";
             }
         }
         forcedDigits = forcedDigits < 0 ? 1 : digits - forcedDigits;
@@ -408,7 +409,7 @@
             c = format.charAt(f);
 
             // Check if we have reached a literal
-            if (c == "'" || c == '"') {
+            if (c === "'" || c === '"') {
 
                 // Find end of literal
                 endIndex = format.indexOf(c, f + 1);
@@ -423,12 +424,12 @@
                 f = endIndex;
 
             // Single escaped character
-            } else if (c == "\\") {
+            } else if (c === "\\") {
                 out.push(format.charAt(f + 1));
                 f++;
 
             // Digit placeholder
-            } else if (c == "#" || c == "0") {
+            } else if (c === "#" || c === "0") {
                 if (i < integralDigits) {
                     // In the integral part
                     if (i >= 0) {
@@ -452,7 +453,7 @@
                 i++;
 
             // Radix point character according to current culture.
-            } else if (c == ".") {
+            } else if (c === ".") {
                 if (number.length > ++i || forcedDecimals > 0) {
                     out.push(radixPoint);
                 }
@@ -556,7 +557,7 @@
                         exponentPrecision = 3,
                         minDecimals, maxDecimals;
 
-                    if (standardFormatStringMatch_UpperCase == "G") {
+                    if (standardFormatStringMatch_UpperCase === "G") {
                         if (exponent > -5 && (!precision || exponent < precision)) {
                             minDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 0;
                             maxDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 10;
@@ -564,7 +565,7 @@
                             return basicNumberFormatter(number, 1, minDecimals, maxDecimals, radixPoint);
                         }
 
-                        exponentPrefix = exponentPrefix == "G" ? "E" : "e";
+                        exponentPrefix = exponentPrefix === "G" ? "E" : "e";
                         exponentPrecision = 2;
 
                         // The precision of G is number of significant digits, not the number of decimals.
@@ -604,7 +605,7 @@
 
                     var result = Math.round(number).toString(16);
 
-                    if (standardFormatStringMatch[1] == "X") {
+                    if (standardFormatStringMatch[1] === "X") {
                         result = result.toUpperCase();
                     }
 
@@ -676,51 +677,61 @@
         format = format || "G";
 
         // Resolve standard date/time format strings
-        if (format.length == 1) {
+        if (format.length === 1) {
             format = currentCulture[format] || format;
         }
+
+        // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
+        var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
+
+        // Don't use AM/PM for languages where it isn't used
+        var useAmPm = currentCulture.t.indexOf('H') === -1;
 
 		return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
 			function (match) {
 
+                if (!useAmPm && (match === "tt" || match === "t")) {
+                    return "";
+                }
+
                         // Day
-                return match == "dddd" ? currentCulture._D[dayOfWeek] :
+                return match === "dddd" ? currentCulture._D[dayOfWeek] :
                                              // Use three first characters from long day name if abbreviations are not specifed
-                        match == "ddd"  ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
-                        match == "dd"   ? numberPair(dayOfMonth) :
-                        match == "d"    ? dayOfMonth :
+                        match === "ddd"  ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
+                        match === "dd"   ? numberPair(dayOfMonth) :
+                        match === "d"    ? dayOfMonth :
 
                         // Month
-                        match == "MMMM" ? currentCulture._M[month] :
+                        match === "MMMM" ? monthNames[month] :
                                              // Use three first characters from long month name if abbreviations are not specifed
-                        match == "MMM"  ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
-                        match == "MM"   ? numberPair(month + 1) :
-                        match == "M"    ? month + 1 :
+                        match === "MMM"  ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
+                        match === "MM"   ? numberPair(month + 1) :
+                        match === "M"    ? month + 1 :
 
                         // Year
-                        match == "yyyy" ? year :
-                        match == "yy"   ? ("" + year).substr(2) :
+                        match === "yyyy" ? year :
+                        match === "yy"   ? ("" + year).substr(2) :
 
                         // Hour
-                        match == "HH"   ? numberPair(hour) :
-                        match == "H"    ? hour :
-                        match == "hh"   ? numberPair((hour - 1) % 12 + 1) :
-                        match == "h"    ? (hour - 1) % 12 + 1 :
+                        match === "HH"   ? numberPair(hour) :
+                        match === "H"    ? hour :
+                        match === "hh"   ? numberPair((hour - 1) % 12 + 1) :
+                        match === "h"    ? (hour - 1) % 12 + 1 :
 
                         // Minute
-                        match == "mm"   ? numberPair(minute) :
-                        match == "m"    ? minute :
+                        match === "mm"   ? numberPair(minute) :
+                        match === "m"    ? minute :
 
                         // Second
-                        match == "ss"   ? numberPair(second) :
-                        match == "s"    ? second :
+                        match === "ss"   ? numberPair(second) :
+                        match === "s"    ? second :
 
                         // AM/PM
-                        match == "tt"   ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
-                        match == "t"    ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
+                        match === "tt"   ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
+                        match === "t"    ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
 
                         // String literal => strip quotation marks
-                        match.substr(1, match.length - 1 - (match.charAt(0) != "\\"));
+                        match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
 			}
         );
     }
