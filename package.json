@@ -1,6 +1,6 @@
 {
   "name": "sffjs",
-  "version": "1.10.0-alpha.1",
+  "version": "1.10.0-alpha.3",
   "description": "String.Format for JavaScript",
   "main": "src/sffjs.js",
   "directories": {
