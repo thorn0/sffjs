@@ -135,6 +135,10 @@
         assert.formatsTo("1989 April", "{0:y}", dtpm);
         assert.formatsTo("1989 April", "{0:Y}", dtpm);
 
+        // D and Y are not expanded as a part of the pattern
+        assert.formatsTo("D 89", "{0:D yy}", dtpm);
+        assert.formatsTo("Y 89", "{0:Y yy}", dtpm);
+
         test.section("Date/time custom");
         assert.formatsTo("1989-04-02 18:20:33", "{0:yyyy-MM-dd HH:mm:ss}", dtpm);
         assert.formatsTo("06:20:33 A", "{0:hh:mm:ss t}", dtam);
@@ -287,6 +291,14 @@
         assert.formatsTo("2353", "{0:R}", 2353);
         assert.formatsTo("25.3333333", "{0:R}", 25.3333333);
 
+        test.section("Culture uk-UA");
+        sffjs.setCulture("uk-UA");
+        assert.formatsTo("02.04.1989", "{0:d}", dtam);
+        assert.formatsTo("2 квітня 1989 р. 18:20:33", "{0:F}", dtpm);
+        assert.formatsTo("2 Кві", "{0:d MMM}", dtam);
+        assert.formatsTo("2 квітня", "{0:d MMMM}", dtam);
+        assert.formatsTo("6:20 ", "{0:h:mm tt}", dtam);
+
         test.section("Culture sv-se");
         sffjs.setCulture("sv-SE");
         assert.formatsTo("1,2e+03", "{0:g2}", 1242.55);
@@ -305,12 +317,6 @@
         assert.formatsTo("april 1989", "{0:y}", dtpm);
 
         assert.formatsTo("1.555,48 kr", "{0:c}", 1555.475);
-
-        test.section("Culture uk-UA");
-        sffjs.setCulture("uk-UA");
-        assert.formatsTo("02.04.1989", "{0:d}", dtam);
-        assert.formatsTo("2 Кві", "{0:d MMM}", dtam);
-        assert.formatsTo("2 квітня", "{0:d MMMM}", dtam);
 
         test.section("Date/time standard (en-US)");
         sffjs.setCulture("en-US");
@@ -331,6 +337,8 @@
         assert.formatsTo("06mm33", "{0:hh'mm'ss}", dtam);
         assert.formatsTo("06mm33", "{0:hh\"mm\"ss}", dtam);
         assert.formatsTo("06m2033", "{0:hh\\mmss}", dtam);
+
+        assert.formatsTo("Apr '89", "{0:MMM \\'yy}", dtam);
 
         // The handling of non-matching quotation marks in date/time format strings is not compatible
         // with .NET, but this is ignored, as a solution would inflate the library.
