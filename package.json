@@ -1,0 +1,30 @@
+{
+  "name": "sffjs",
+  "version": "1.10.0-alpha.1",
+  "description": "String.Format for JavaScript",
+  "main": "src/sffjs.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thorn0/sffjs.git"
+  },
+  "keywords": [
+    "dotnet",
+    ".net",
+    "string.format"
+  ],
+  "contributors": [
+    "Daniel Mester Pirttijarvi (http://www.masterdata.se)",
+    "Georgii Dolzhykov <georgii.dolzhykov@gmail.com>"
+  ],
+  "license": "zlib",
+  "bugs": {
+    "url": "https://github.com/thorn0/sffjs/issues"
+  },
+  "homepage": "https://github.com/thorn0/sffjs"
+}
