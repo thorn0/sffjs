@@ -3,20 +3,39 @@ module.exports = function(grunt) {
     var pkg = require('./package.json');
     grunt.registerTask('default', ['clean', 'copy', 'uglify']);
     grunt.initConfig({
+        buildcontrol: {
+            options: {
+                dir: 'build',
+                commit: true,
+                push: true,
+                message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%',
+                tag: pkg.version
+            },
+            build: {
+                options: {
+                    remote: '../',
+                    branch: 'build'
+                }
+            }
+        },
         clean: {
-            build: 'build'
+            build: ['build/**/*', '!build/.git/**/*']
         },
         copy: {
-            build: {
+            src: {
+                src: 'src/sffjs.js',
+                dest: 'build/sffjs.js',
                 options: {
                     process: function(content) {
                         return content.replace(/%VERSION%/g, pkg.version);
                     }
-                },
+                }
+            },
+            extras: {
                 files: [{
+                    flatten: true,
                     expand: true,
-                    cwd: 'src',
-                    src: 'sffjs.js',
+                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt'],
                     dest: 'build/',
                 }]
             }
