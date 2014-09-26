@@ -33,9 +33,8 @@ module.exports = function(grunt) {
             },
             extras: {
                 files: [{
-                    flatten: true,
                     expand: true,
-                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt'],
+                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt', 'test/*'],
                     dest: 'build/',
                 }],
                 options: {

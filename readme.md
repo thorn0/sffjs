@@ -17,8 +17,8 @@ String.Format method in Microsoft .NET Framework.
 
 * `sffjs.min.js`                - Compressed and obfuscated, to be used in production.
 * `sffjs.js`                    - Commented source file for your reference.
-* `tests.html`                  - Test page that performs unit tests on the library.
-* `tests.js`                    - Script for tests.html.
+* `test/tests.html`             - Test page that performs unit tests on the library.
+* `test/tests.js`               - Script for tests.html.
 * `cultures/stringformat.XX.js` - Files holding metadata about cultures.
 
 ## How to use
