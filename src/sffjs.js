@@ -793,7 +793,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.09";
+    sffjs.version = "%VERSION%";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>
