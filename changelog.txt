@@ -82,7 +82,7 @@ Version 1.10 (fork)
 Not released
 
 * Bug fix: genitive forms for months (needed for Slavic languages)
-* Added support for AMD and CommonJS. Global namespace and browser built-in
+* Added support for AMD and CommonJS. The global object and other native
   objects such as String aren't modified if the library is loaded
   via AMD or CommonJS.
 * The sffjs object is a function now. It's the same function that is
