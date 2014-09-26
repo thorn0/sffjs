@@ -27,7 +27,7 @@ module.exports = function(grunt) {
                 dest: 'build/sffjs.js',
                 options: {
                     process: function(content) {
-                        return content.replace(/%VERSION%/g, pkg.version);
+                        return content.replace(/%VERSION%/g, pkg.version).replace(/\r/g, '');
                     }
                 }
             },
@@ -37,7 +37,12 @@ module.exports = function(grunt) {
                     expand: true,
                     src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt'],
                     dest: 'build/',
-                }]
+                }],
+                options: {
+                    process: function(content) {
+                        return content.replace(/\r/g, '');
+                    }
+                }
             }
         },
         uglify: {
