@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript
+ * String.format for JavaScript, version 1.10.0-alpha.8
  *
  * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
@@ -788,7 +788,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.10.0-alpha.7";
+    sffjs.version = "1.10.0-alpha.8";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>
