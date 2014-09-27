@@ -112,7 +112,9 @@
 
         // Add missing formats from the culture template
         for (var key in CULTURE_TEMPLATE) {
-            culture[key] = culture[key] || CULTURE_TEMPLATE[key];
+            if (culture[key] == null) {
+                culture[key] = CULTURE_TEMPLATE[key];
+            }
         }
 
         // Construct composite formats if they are not already defined
@@ -684,15 +686,8 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        // Don't use AM/PM for languages where it isn't used
-        var useAmPm = currentCulture.t.indexOf('H') === -1;
-
 		return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
 			function (match) {
-
-                if (!useAmPm && (match === "tt" || match === "t")) {
-                    return "";
-                }
 
                         // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
