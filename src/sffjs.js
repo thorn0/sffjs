@@ -1,5 +1,5 @@
 ﻿/**
- * String.format for JavaScript
+ * String.format for JavaScript, version %VERSION%
  *
  * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
