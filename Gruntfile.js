@@ -31,10 +31,20 @@ module.exports = function(grunt) {
                     }
                 }
             },
+            tests: {
+                files: [{
+                    src: 'test/tests.html',
+                    dest: 'build/',
+                }],
+                options: {
+                    process: function(content) {
+                        return content.replace(/\.\.\/src\//g, '../').replace(/\r/g, '');
+                    }
+                }
+            },
             extras: {
                 files: [{
-                    expand: true,
-                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt', 'test/*'],
+                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt', 'test/tests.js'],
                     dest: 'build/',
                 }],
                 options: {
