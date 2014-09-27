@@ -6,7 +6,7 @@
     "Georgii Dolzhykov"
   ],
   "description": "String.Format for JavaScript",
-  "main": "sffjs.min.js",
+  "main": "sffjs.js",
   "moduleType": [
     "amd",
     "globals",
