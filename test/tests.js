@@ -27,7 +27,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
-
+/*global sffjs,require*/
 (function () {
     /// <summary>
     ///     Performs a series of unit tests and writes the output to the page.
@@ -44,7 +44,6 @@
                     lastname: "Doe",
                     phonenumbers: [
                         {
-                            home: "012",
                             home: "345"
                         }
                     ],
@@ -68,7 +67,7 @@
         assert.formatsTo("!true!", "!{0}!", true);
         assert.formatsTo("null:!!", "null:!{0}!", null);
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
-        assert.doesThrow(function () { String.format("{1}", 42) }, "Missing argument", "Index out of range");
+        assert.doesThrow(function () { String.format("{1}", 42); }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
 
 
@@ -402,15 +401,15 @@
                 name: name,
                 results: []
             });
-        }
+        };
 
         this.result = function (result) {
-            if (t.sections.length == 0) {
+            if (t.sections.length === 0) {
                 t.section("Untitled test section");
             }
 
             t.sections[t.sections.length - 1].results.push(result);
-        }
+        };
 
         this.print = function () {
             var container = document.createElement("div");
@@ -418,8 +417,10 @@
             var numTests = 0;
             var numPassedTests = 0;
 
-            for (var si in this.sections) {
-                for (var ri in this.sections[si].results) {
+            var si, ri;
+
+            for (si in this.sections) {
+                for (ri in this.sections[si].results) {
                     numTests++;
                     if (this.sections[si].results[ri].result) {
                         numPassedTests++;
@@ -428,7 +429,7 @@
             }
 
             var totalResult = document.createElement("div");
-            totalResult.className = numPassedTests == numTests ? "pass" : "fail";
+            totalResult.className = (numPassedTests == numTests ? "pass" : "fail") + " total-result";
             totalResult.innerHTML = String.format("<em>{0}</em> of <em>{1}</em> tests passed", numPassedTests, numTests);
             totalResult.setAttribute("data-percent", Math.round(100 * numPassedTests / numTests));
             container.appendChild(totalResult);
@@ -453,7 +454,7 @@
                 return tr;
             }
 
-            for (var si in t.sections) {
+            for (si in t.sections) {
                 var section = t.sections[si];
 
                 tr = createRow();
@@ -462,7 +463,7 @@
                 td.appendChild(document.createTextNode(section.name));
                 tr.appendChild(td);
 
-                for (var ri in section.results) {
+                for (ri in section.results) {
                     var result = section.results[ri];
 
                     tr = createRow();
@@ -483,12 +484,14 @@
                     td = document.createElement("td");
                     td.className = "error";
                     tr.appendChild(td);
-                    if (result.errorMessage) td.appendChild(document.createTextNode(result.errorMessage));
+                    if (result.errorMessage) {
+                        td.appendChild(document.createTextNode(result.errorMessage));
+                    }
                 }
             }
 
             document.body.appendChild(container);
-        }
+        };
     }
 
     function registerTestResult(message, errorMessage) {
@@ -502,7 +505,9 @@
     }
 
     function stringify(value) {
-        if (value === null) return "[null]";
+        if (value === null) {
+            return "[null]";
+        }
 
         switch (typeof value) {
             case "number": return value.toString();
@@ -559,7 +564,7 @@
             assert.areEqual(expectedError, actualError, message);
         },
 
-        formatsTo: function (expected, formatString, obj0, obj1, obj2) {
+        formatsTo: function (expected, formatString, obj0) {
             var args = Array.prototype.slice.call(arguments, 1);
             var actual;
 
@@ -572,7 +577,7 @@
                 return;
             }
 
-            var message = String.format("{0,-25}  {1}", formatString, actual);
+            message = String.format("{0,-25}  {1}", formatString, actual);
 
             assert.areEqual(expected, actual, message);
         }
