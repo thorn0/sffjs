@@ -52,6 +52,9 @@ module.exports = function(grunt) {
                         return content.replace(/\r/g, '');
                     }
                 }
+            },
+            options: {
+                timestamp: true
             }
         },
         uglify: {
