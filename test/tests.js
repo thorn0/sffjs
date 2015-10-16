@@ -28,26 +28,27 @@
  *
  */
 /*global sffjs,require*/
-(function () {
+(function() {
     /// <summary>
     ///     Performs a series of unit tests and writes the output to the page.
     /// </summary>
-
 
     function runTests(test) {
         sffjs.setCulture("en");
 
         var testObject = {
+            a: "b",
             authors: [
                 {
-                    firstname: "John",
-                    lastname: "Doe",
+                firstname: "John",
+                lastname: "Doe",
                     phonenumbers: [
                         {
-                            home: "345"
+                            home: "012",
+                    home: "345"
                         }
                     ],
-                    age: 27
+                age: 27
                 }
             ]
         };
@@ -58,7 +59,7 @@
         assert.formatsTo("Test {with} brackets", "Test {{with}} brackets");
         assert.formatsTo("{brackets} in args", "{0} in args", "{brackets}");
         assert.formatsTo("{{dblbrackets}} in args", "{0} in args", "{{dblbrackets}}");
-        assert.formatsTo("Mismatch {{0}", "Mismatch {{{0}}", "{{brackets}");
+        assert.formatsTo("Mismatch {{{brackets}}", "Mismatch {{{0}}", "{{brackets}");
         assert.formatsTo("Double outer {{{brackets}}", "Double outer {{{0}}}", "{{brackets}");
 
         test.section("Index");
@@ -67,9 +68,8 @@
         assert.formatsTo("!true!", "!{0}!", true);
         assert.formatsTo("null:!!", "null:!{0}!", null);
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
-        assert.doesThrow(function () { String.format("{1}", 42); }, "Missing argument", "Index out of range");
+        assert.doesThrow(function () { String.format("{1}", 42) }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
-
 
         test.section("Path");
         assert.formatsTo("Hi, John!", "Hi, {authors[0].firstname}!", testObject);
@@ -82,6 +82,7 @@
         assert.formatsTo("Hi, !", "Hi, {authors.fdg}!", testObject);
         assert.formatsTo("Hi, 1!", "Hi, {authors.length}!", testObject);
         assert.formatsTo("1.00", "{authors.length:0.00}", testObject);
+        assert.formatsTo("After a comes b.", "After a comes {a}.", testObject);
 
         test.section("Invalid paths");
         assert.formatsTo("Hi, {fg$}!", "Hi, {fg$}!", undefined);
@@ -91,6 +92,21 @@
         assert.formatsTo("Hi, {.fg}!", "Hi, {.fg}!", undefined);
         assert.formatsTo("Hi, {a..b}!", "Hi, {a..b}!", undefined);
 
+        test.section("Escaped braces");
+        assert.formatsTo("a { b", "a {{ b", testObject);
+        assert.formatsTo("a } b", "a }} b", testObject);
+        assert.formatsTo("a{{a}}", "a{{{{a}}}", testObject); // *
+        assert.formatsTo("a{{b}", "a{{{{{a}}}", testObject);
+        assert.formatsTo("a{aba}a", "a{{a{a}a}}a", testObject);
+        assert.formatsTo("a{{aba", "a{{{a{a}a", testObject); // *
+        assert.formatsTo("a{bbb{}a", "a{{b{a}{a}{}a", testObject); // *
+        assert.formatsTo("4}.2", "{0:0}}.0}", 4.2);
+        assert.formatsTo("4{.2", "{0:0{{.0}", 4.2);
+        assert.formatsTo("4}{{}.2", "{0:0}}{{{{}}.0}", 4.2);
+        // * These tests do not produce the same output as in .NET. In .NET these format strings will 
+        // generate a FormatException while the JS implementation makes a best effort to finish processing
+        // the format string.
+        
         var dtam = new Date(1989, 3, 2, 6, 20, 33);
         var dtpm = new Date(1989, 3, 2, 18, 20, 33);
         var dt2009 = new Date(2009, 3, 2, 18, 20, 33);
@@ -356,8 +372,6 @@
 
         assert.formatsTo("{brackets} in args", "{0} in args", "{brackets}");
         assert.formatsTo("{{dblbrackets}} in args", "{0} in args", "{{dblbrackets}}");
-        assert.formatsTo("Mismatch {{0}", "Mismatch {{{0}}", "{{brackets}");
-        assert.formatsTo("Double outer {{{brackets}}", "Double outer {{{0}}}", "{{brackets}");
 
         test.section("setCulture");
         sffjs.registerCulture({ name: "__LANG" });
@@ -389,21 +403,21 @@
         sffjs.setCulture("");
     }
 
-
+    
     function Test() {
         var t = this;
 
         window.currentTest = this;
         this.sections = [];
 
-        this.section = function (name) {
+        this.section = function(name) {
             t.sections.push({
                 name: name,
                 results: []
             });
         };
 
-        this.result = function (result) {
+        this.result = function(result) {
             if (t.sections.length === 0) {
                 t.section("Untitled test section");
             }
@@ -411,7 +425,7 @@
             t.sections[t.sections.length - 1].results.push(result);
         };
 
-        this.print = function () {
+        this.print = function() {
             var container = document.createElement("div");
 
             var numTests = 0;
@@ -442,7 +456,6 @@
             progress.style.width = Math.round(100 * numPassedTests / numTests) + "%";
             progressBar.appendChild(progress);
             totalResult.appendChild(progressBar);
-
 
             var table = document.createElement("table");
             var tr, td;
@@ -510,12 +523,16 @@
         }
 
         switch (typeof value) {
-            case "number": return value.toString();
+            case "number":
+                return value.toString();
             case "string":
-                if (value.length > 40) { value = value.substr(0, 40) + "..."; }
+                if (value.length > 40) {
+                    value = value.substr(0, 40) + "...";
+                }
                 return "\"" + value + "\"";
 
-            case "undefined": return "[undefined]";
+            case "undefined":
+                return "[undefined]";
             case "object":
 
                 if (value instanceof Date) {
@@ -543,7 +560,7 @@
     }
 
     var assert = {
-        areEqual: function (expected, actual, message) {
+        areEqual: function(expected, actual, message) {
             var result = actual === expected;
 
             actual = stringify(actual);
@@ -552,7 +569,7 @@
             registerTestResult(message, result ? null : String.format("Expected: {0}, actual: {1}", expected, actual));
         },
 
-        doesThrow: function (fn, expectedError, message) {
+        doesThrow: function(fn, expectedError, message) {
             var actualError = "[No exception thrown]";
 
             try {
@@ -564,7 +581,7 @@
             assert.areEqual(expectedError, actualError, message);
         },
 
-        formatsTo: function (expected, formatString, obj0) {
+        formatsTo: function(expected, formatString, obj0) {
             var args = Array.prototype.slice.call(arguments, 1);
             var actual;
 
@@ -590,7 +607,7 @@
 
     var s = String.format;
     var formats = 0;
-    String.format = function () {
+    String.format = function() {
         formats++;
         return s.apply(null, arguments);
     };
