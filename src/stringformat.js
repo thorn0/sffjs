@@ -174,8 +174,8 @@
 
         // Parse and evaluate path
         if (hasValue(value)) {
-            var followingMembers = /(\.([a-zA-Z_$]\w+)|\[(\d+)\])/g,
-                match = /^[a-zA-Z_$]\w+/.exec(path);
+            var followingMembers = /(\.([a-zA-Z_$]\w*)|\[(\d+)\])/g,
+                match = /^[a-zA-Z_$]\w*/.exec(path);
 
             value = value[match[0]];
 
@@ -210,14 +210,6 @@
                 out.push(out.t);
             }
         }
-    }
-
-    function unescapeBraces(braces, consumedBraces) {
-        /// <summary>Replaces escaped brackets ({ and }) with their unescaped representation.</summary>
-        /// <param name="braces">A string containing braces of a single type only.</param>
-        /// <param name="consumedBraces">The number of braces that should be ignored when unescaping.</param>
-        /// <returns>A string of the unescaped braces.</returns>
-        return braces.substr(0, (braces.length + 1 - (consumedBraces || 0)) / 2);
     }
 
     function processFormatItem(pathOrIndex, align, formatString, args) {
@@ -741,25 +733,22 @@
 
         var outerArgs = arguments;
 
-        return str.replace(/(\{+)((\d+|[a-zA-Z_$]\w+(?:\.[a-zA-Z_$]\w+|\[\d+\])*)(?:\,(-?\d*))?(?:\:([^\}]*))?)(\}+)|(\{+)|(\}+)/g, function() {
+        return str.replace(/\{((\d+|[a-zA-Z_$]\w*(?:\.[a-zA-Z_$]\w*|\[\d+\])*)(?:\,(-?\d*))?(?:\:([^\}]*(?:(?:\}\})+[^\}]+)*))?)\}|(\{\{)|(\}\})/g, function() {
             var innerArgs = arguments;
 
             // Handle escaped {
-            return innerArgs[7] ? unescapeBraces(innerArgs[7]) :
+            return innerArgs[5] ? "{" :
 
                 // Handle escaped }
-                innerArgs[8] ? unescapeBraces(innerArgs[8]) :
-
-                // Handle case when both { and } are present, but one or both of them are escaped
-                !(innerArgs[1].length % 2 && innerArgs[6].length % 2) ?
-                unescapeBraces(innerArgs[1]) +
-                innerArgs[2] +
-                unescapeBraces(innerArgs[6]) :
+                innerArgs[6] ? "}" :
 
                 // Valid format item
-                unescapeBraces(innerArgs[1], 1) +
-                processFormatItem(innerArgs[3], innerArgs[4], innerArgs[5], outerArgs) +
-                unescapeBraces(innerArgs[6], 1);
+                processFormatItem(
+                    innerArgs[2],
+                    innerArgs[3],
+                    // Format string might contain escaped braces
+                    innerArgs[4] && innerArgs[4].replace(/\}\}/g, "}").replace(/\{\{/g, "{"),
+                    outerArgs);
         });
     }
 

@@ -37,14 +37,20 @@
         sffjs.setCulture("en");
 
         var testObject = {
-            authors: [{
+            a: "b",
+            authors: [
+                {
                 firstname: "John",
                 lastname: "Doe",
-                phonenumbers: [{
+                    phonenumbers: [
+                        {
+                            home: "012",
                     home: "345"
-                }],
+                        }
+                    ],
                 age: 27
-            }]
+                }
+            ]
         };
 
         var undefined;
@@ -53,7 +59,7 @@
         assert.formatsTo("Test {with} brackets", "Test {{with}} brackets");
         assert.formatsTo("{brackets} in args", "{0} in args", "{brackets}");
         assert.formatsTo("{{dblbrackets}} in args", "{0} in args", "{{dblbrackets}}");
-        assert.formatsTo("Mismatch {{0}", "Mismatch {{{0}}", "{{brackets}");
+        assert.formatsTo("Mismatch {{{brackets}}", "Mismatch {{{0}}", "{{brackets}");
         assert.formatsTo("Double outer {{{brackets}}", "Double outer {{{0}}}", "{{brackets}");
 
         test.section("Index");
@@ -62,9 +68,7 @@
         assert.formatsTo("!true!", "!{0}!", true);
         assert.formatsTo("null:!!", "null:!{0}!", null);
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
-        assert.doesThrow(function() {
-            String.format("{1}", 42);
-        }, "Missing argument", "Index out of range");
+        assert.doesThrow(function () { String.format("{1}", 42) }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
 
         test.section("Path");
@@ -78,6 +82,7 @@
         assert.formatsTo("Hi, !", "Hi, {authors.fdg}!", testObject);
         assert.formatsTo("Hi, 1!", "Hi, {authors.length}!", testObject);
         assert.formatsTo("1.00", "{authors.length:0.00}", testObject);
+        assert.formatsTo("After a comes b.", "After a comes {a}.", testObject);
 
         test.section("Invalid paths");
         assert.formatsTo("Hi, {fg$}!", "Hi, {fg$}!", undefined);
@@ -87,6 +92,21 @@
         assert.formatsTo("Hi, {.fg}!", "Hi, {.fg}!", undefined);
         assert.formatsTo("Hi, {a..b}!", "Hi, {a..b}!", undefined);
 
+        test.section("Escaped braces");
+        assert.formatsTo("a { b", "a {{ b", testObject);
+        assert.formatsTo("a } b", "a }} b", testObject);
+        assert.formatsTo("a{{a}}", "a{{{{a}}}", testObject); // *
+        assert.formatsTo("a{{b}", "a{{{{{a}}}", testObject);
+        assert.formatsTo("a{aba}a", "a{{a{a}a}}a", testObject);
+        assert.formatsTo("a{{aba", "a{{{a{a}a", testObject); // *
+        assert.formatsTo("a{bbb{}a", "a{{b{a}{a}{}a", testObject); // *
+        assert.formatsTo("4}.2", "{0:0}}.0}", 4.2);
+        assert.formatsTo("4{.2", "{0:0{{.0}", 4.2);
+        assert.formatsTo("4}{{}.2", "{0:0}}{{{{}}.0}", 4.2);
+        // * These tests do not produce the same output as in .NET. In .NET these format strings will 
+        // generate a FormatException while the JS implementation makes a best effort to finish processing
+        // the format string.
+        
         var dtam = new Date(1989, 3, 2, 6, 20, 33);
         var dtpm = new Date(1989, 3, 2, 18, 20, 33);
         var dt2009 = new Date(2009, 3, 2, 18, 20, 33);
@@ -352,22 +372,12 @@
 
         assert.formatsTo("{brackets} in args", "{0} in args", "{brackets}");
         assert.formatsTo("{{dblbrackets}} in args", "{0} in args", "{{dblbrackets}}");
-        assert.formatsTo("Mismatch {{0}", "Mismatch {{{0}}", "{{brackets}");
-        assert.formatsTo("Double outer {{{brackets}}", "Double outer {{{0}}}", "{{brackets}");
 
         test.section("setCulture");
-        sffjs.registerCulture({
-            name: "__LANG"
-        });
-        sffjs.registerCulture({
-            name: "__LANG-REGION"
-        });
-        sffjs.registerCulture({
-            name: "__LANG2"
-        });
-        sffjs.registerCulture({
-            name: "__LANG3-region"
-        });
+        sffjs.registerCulture({ name: "__LANG" });
+        sffjs.registerCulture({ name: "__LANG-REGION" });
+        sffjs.registerCulture({ name: "__LANG2" });
+        sffjs.registerCulture({ name: "__LANG3-region" });
 
         sffjs.setCulture("");
         assert.areEqual("", sffjs.LC.name, "Invariant culture");
@@ -387,14 +397,13 @@
         sffjs.setCulture("__LANG3");
         assert.areEqual("", sffjs.LC.name, "Non-existing neutral");
 
-        sffjs.registerCulture({
-            name: "__Lang3"
-        });
+        sffjs.registerCulture({ name: "__Lang3" });
         assert.areEqual("__Lang3", sffjs.LC.name, "Delayed neutral");
 
         sffjs.setCulture("");
     }
 
+    
     function Test() {
         var t = this;
 
