@@ -46,8 +46,8 @@
 
     // ***** Private Variables *****
 
-        // This is the default values of a culture. Any missing format will default to the format in CULTURE_TEMPLATE.
-        // The invariant culture is generated from these default values.
+    // This is the default values of a culture. Any missing format will default to the format in CULTURE_TEMPLATE.
+    // The invariant culture is generated from these default values.
     var CULTURE_TEMPLATE = {
             name: "", // Empty on invariant culture
             d: "MM/dd/yyyy",
@@ -63,7 +63,7 @@
             _t: ",", // Thounsands separator
             _c: "¤#,0.00", // Currency format string
             _ct: ",", // Currency thounsands separator
-            _cr: ".",  // Currency radix point
+            _cr: ".", // Currency radix point
             _am: "AM",
             _pm: "PM"
         },
@@ -80,7 +80,6 @@
 
         // Holds all registered external cultures, i.e. not the invariant culture
         cultures = {};
-
 
     // ***** Private Methods *****
 
@@ -140,7 +139,6 @@
         sffjs.LC = currentCulture = result || INVARIANT_CULTURE;
     }
 
-
     // Maths
 
     function numberToString(number, decimals) {
@@ -163,7 +161,6 @@
         var point = numberString.indexOf(".");
         return point < 0 ? 0 : numberString.length - point - 1;
     }
-
 
     // Formatting helpers
 
@@ -361,7 +358,7 @@
                 // This is the way .NET handles things.
                 if (i < 0) break;
 
-            // Check for single escaped character
+                // Check for single escaped character
             } else if (c === "\\") {
                 i++;
 
@@ -425,12 +422,12 @@
                 if (endIndex < 0) break;
                 f = endIndex;
 
-            // Single escaped character
+                // Single escaped character
             } else if (c === "\\") {
                 out.push(format.charAt(f + 1));
                 f++;
 
-            // Digit placeholder
+                // Digit placeholder
             } else if (c === "#" || c === "0") {
                 if (i < integralDigits) {
                     // In the integral part
@@ -454,13 +451,13 @@
 
                 i++;
 
-            // Radix point character according to current culture.
+                // Radix point character according to current culture.
             } else if (c === ".") {
                 if (number.length > ++i || forcedDecimals > 0) {
                     out.push(radixPoint);
                 }
 
-            // Other characters are written as they are, except from commas
+                // Other characters are written as they are, except from commas
             } else if (c !== ",") {
                 out.push(c);
             }
@@ -497,8 +494,7 @@
         // http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx
 
         var standardFormatStringMatch = format.match(/^([a-zA-Z])(\d*)$/);
-        if (standardFormatStringMatch)
-        {
+        if (standardFormatStringMatch) {
             var standardFormatStringMatch_UpperCase = standardFormatStringMatch[1].toUpperCase(),
                 precision = parseInt(standardFormatStringMatch[2], 10); // parseInt used to ensure empty string is aprsed to NaN
 
@@ -543,7 +539,8 @@
                     // Note that we might have fell through from G above!
 
                     // Determine coefficient and exponent for normalized notation
-                    var exponent = 0, coefficient = Math.abs(number);
+                    var exponent = 0,
+                        coefficient = Math.abs(number);
 
                     while (coefficient >= 10) {
                         coefficient /= 10;
@@ -667,13 +664,13 @@
 
     // ***** Date Formatting *****
     function mainDateFormatter(date, format) {
-        var year        = date.getFullYear(),
-            month       = date.getMonth(),
-            dayOfMonth  = date.getDate(),
-            dayOfWeek   = date.getDay(),
-            hour        = date.getHours(),
-            minute      = date.getMinutes(),
-            second      = date.getSeconds();
+        var year = date.getFullYear(),
+            month = date.getMonth(),
+            dayOfMonth = date.getDate(),
+            dayOfWeek = date.getDay(),
+            hour = date.getHours(),
+            minute = date.getMinutes(),
+            second = date.getSeconds();
 
         // If no format is specified, default to G format
         format = format || "G";
@@ -686,48 +683,48 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-		return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
-			function (match) {
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
+            function(match) {
 
-                        // Day
+                // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
-                                             // Use three first characters from long day name if abbreviations are not specifed
-                        match === "ddd"  ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
-                        match === "dd"   ? numberPair(dayOfMonth) :
-                        match === "d"    ? dayOfMonth :
+                    // Use three first characters from long day name if abbreviations are not specifed
+                    match === "ddd" ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
+                    match === "dd" ? numberPair(dayOfMonth) :
+                    match === "d" ? dayOfMonth :
 
-                        // Month
-                        match === "MMMM" ? monthNames[month] :
-                                             // Use three first characters from long month name if abbreviations are not specifed
-                        match === "MMM"  ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
-                        match === "MM"   ? numberPair(month + 1) :
-                        match === "M"    ? month + 1 :
+                    // Month
+                    match === "MMMM" ? monthNames[month] :
+                    // Use three first characters from long month name if abbreviations are not specifed
+                    match === "MMM" ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
+                    match === "MM" ? numberPair(month + 1) :
+                    match === "M" ? month + 1 :
 
-                        // Year
-                        match === "yyyy" ? year :
-                        match === "yy"   ? ("" + year).substr(2) :
+                    // Year
+                    match === "yyyy" ? year :
+                    match === "yy" ? ("" + year).substr(2) :
 
-                        // Hour
-                        match === "HH"   ? numberPair(hour) :
-                        match === "H"    ? hour :
-                        match === "hh"   ? numberPair((hour - 1) % 12 + 1) :
-                        match === "h"    ? (hour - 1) % 12 + 1 :
+                    // Hour
+                    match === "HH" ? numberPair(hour) :
+                    match === "H" ? hour :
+                    match === "hh" ? numberPair((hour - 1) % 12 + 1) :
+                    match === "h" ? (hour - 1) % 12 + 1 :
 
-                        // Minute
-                        match === "mm"   ? numberPair(minute) :
-                        match === "m"    ? minute :
+                    // Minute
+                    match === "mm" ? numberPair(minute) :
+                    match === "m" ? minute :
 
-                        // Second
-                        match === "ss"   ? numberPair(second) :
-                        match === "s"    ? second :
+                    // Second
+                    match === "ss" ? numberPair(second) :
+                    match === "s" ? second :
 
-                        // AM/PM
-                        match === "tt"   ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
-                        match === "t"    ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
+                    // AM/PM
+                    match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
+                    match === "t" ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
 
-                        // String literal => strip quotation marks
-                        match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
-			}
+                    // String literal => strip quotation marks
+                    match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
+            }
         );
     }
 
@@ -744,22 +741,22 @@
 
         var outerArgs = arguments;
 
-        return str.replace(/(\{+)((\d+|[a-zA-Z_$]\w+(?:\.[a-zA-Z_$]\w+|\[\d+\])*)(?:\,(-?\d*))?(?:\:([^\}]*))?)(\}+)|(\{+)|(\}+)/g, function () {
+        return str.replace(/(\{+)((\d+|[a-zA-Z_$]\w+(?:\.[a-zA-Z_$]\w+|\[\d+\])*)(?:\,(-?\d*))?(?:\:([^\}]*))?)(\}+)|(\{+)|(\}+)/g, function() {
             var innerArgs = arguments;
 
             // Handle escaped {
             return innerArgs[7] ? unescapeBraces(innerArgs[7]) :
 
-            // Handle escaped }
+                // Handle escaped }
                 innerArgs[8] ? unescapeBraces(innerArgs[8]) :
 
-            // Handle case when both { and } are present, but one or both of them are escaped
+                // Handle case when both { and } are present, but one or both of them are escaped
                 !(innerArgs[1].length % 2 && innerArgs[6].length % 2) ?
-                    unescapeBraces(innerArgs[1]) +
-                    innerArgs[2] +
-                    unescapeBraces(innerArgs[6]) :
+                unescapeBraces(innerArgs[1]) +
+                innerArgs[2] +
+                unescapeBraces(innerArgs[6]) :
 
-            // Valid format item
+                // Valid format item
                 unescapeBraces(innerArgs[1], 1) +
                 processFormatItem(innerArgs[3], innerArgs[4], innerArgs[5], outerArgs) +
                 unescapeBraces(innerArgs[6], 1);

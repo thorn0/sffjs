@@ -1,7 +1,9 @@
 module.exports = function(grunt) {
     require('load-grunt-tasks')(grunt);
     var pkg = require('./package.json');
-    grunt.registerTask('default', ['clean', 'copy', 'uglify']);
+    grunt.registerTask('build', ['clean', 'copy', 'uglify']);
+    grunt.registerTask('control', ['build', 'buildcontrol']);
+    grunt.registerTask('default', ['build']);
     grunt.initConfig({
         buildcontrol: {
             options: {
@@ -23,28 +25,37 @@ module.exports = function(grunt) {
         },
         copy: {
             src: {
-                src: 'src/sffjs.js',
+                src: 'src/stringformat.js',
                 dest: 'build/sffjs.js',
                 options: {
                     process: function(content) {
-                        return content.replace(/%VERSION%/g, pkg.version).replace(/\r/g, '');
+                        return content
+                            .replace(/%VERSION%/g, pkg.version)
+                            .replace(/\r/g, '');
                     }
                 }
             },
             tests: {
                 files: [{
-                    src: 'test/tests.html',
-                    dest: 'build/',
+                    src: 'src/tests.html',
+                    dest: 'build/test/tests.html',
+                }, {
+                    src: 'src/stringformat.tests.js',
+                    dest: 'build/test/tests.js'
                 }],
                 options: {
                     process: function(content) {
-                        return content.replace(/\.\.\/src\//g, '../').replace(/\r/g, '');
+                        return content
+                            .replace('stringformat.js', 'sffjs.js')
+                            .replace('stringformat.tests.js', 'tests.js')
+                            .replace(/src="(?!tests\.js)/g, 'src="../')
+                            .replace(/\r/g, '');
                     }
                 }
             },
             extras: {
                 files: [{
-                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt', 'test/tests.js'],
+                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt'],
                     dest: 'build/',
                 }],
                 options: {
