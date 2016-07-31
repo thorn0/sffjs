@@ -68,7 +68,7 @@
         assert.formatsTo("!true!", "!{0}!", true);
         assert.formatsTo("null:!!", "null:!{0}!", null);
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
-        assert.doesThrow(function () { String.format("{1}", 42) }, "Missing argument", "Index out of range");
+        assert.doesThrow(function() { String.format("{1}", 42) }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
 
         test.section("Path");
@@ -103,10 +103,10 @@
         assert.formatsTo("4}.2", "{0:0}}.0}", 4.2);
         assert.formatsTo("4{.2", "{0:0{{.0}", 4.2);
         assert.formatsTo("4}{{}.2", "{0:0}}{{{{}}.0}", 4.2);
-        // * These tests do not produce the same output as in .NET. In .NET these format strings will 
+        // * These tests do not produce the same output as in .NET. In .NET these format strings will
         // generate a FormatException while the JS implementation makes a best effort to finish processing
         // the format string.
-        
+
         var dtam = new Date(1989, 3, 2, 6, 20, 33);
         var dtpm = new Date(1989, 3, 2, 18, 20, 33);
         var dt2009 = new Date(2009, 3, 2, 18, 20, 33);
@@ -212,15 +212,6 @@
 
         test.section("Custom numeric format strings");
         assert.formatsTo("4", "{0:0}", 4.42);
-        assert.formatsTo("42%", "{0:0%}", 0.42);
-        assert.formatsTo("4200%%", "{0:0%%}", 0.42);
-        assert.formatsTo("4%", "{0:0'%'}", 4.2);
-        assert.formatsTo("4%", "{0:0\\%}", 4.2);
-        assert.formatsTo("4200,", "{0:0\\,.}", 4200);
-        assert.formatsTo("4200.", "{0:0,\\.}", 4200);
-        assert.formatsTo("4200,.", "{0:0',.'}", 4200);
-        assert.formatsTo("4", "{0:0,.}", 4200);
-        assert.formatsTo("42.01%", "{0:0.00%}", 0.42009);
         assert.formatsTo("42.01d", "{0:0.00d}", 42.009);
         assert.formatsTo("42.01", "{0:0.0#}", 42.009);
         assert.formatsTo("42.0", "{0:0.0#}", 42.001);
@@ -232,8 +223,25 @@
         assert.formatsTo("042.50", "{0:000.#0}", 42.5);
         assert.formatsTo("042.5", "{0:000.0#}", 42.5);
         assert.formatsTo("042.5000000000000000000000000", "{0:000.0000000000000000000000000}", 42.5);
-
         assert.formatsTo("1098#234.0", "{0:0'098#'000.0#}", 1234);
+
+        test.section("Custom numeric format strings - percent");
+        assert.formatsTo("42%", "{0:0%}", 0.42);
+        assert.formatsTo("4200%%", "{0:0%%}", 0.42);
+        assert.formatsTo("4%", "{0:0'%'}", 4.2);
+        assert.formatsTo("4%", "{0:0\\%}", 4.2);
+        assert.formatsTo("42.01%", "{0:0.00%}", 0.42009);
+
+        test.section("Custom numeric format strings - thousands separator and scaling");
+        assert.formatsTo("4200", "{0:,0,}", 4200000);
+        assert.formatsTo("4,200", "{0:#,0,}", 4200000);
+        assert.formatsTo("4", "{0:#,0,,}", 4200000);
+        assert.formatsTo("4.2", "{0:0,,.0}", 4200000);
+        assert.formatsTo("4.2", "{0:#,0,,.0}", 4200000);
+        assert.formatsTo("4200.0", "{0:0.,0}", 4200);
+        assert.formatsTo("4200,", "{0:0\\,.}", 4200);
+        assert.formatsTo("4.", "{0:0,\\.}", 4200);
+        assert.formatsTo("4200,.", "{0:0',.'}", 4200);
 
         test.section("Specifier D");
         assert.formatsTo("43", "{0:d}", 42.5);
@@ -416,7 +424,6 @@
         sffjs.setCulture("");
     }
 
-    
     function Test() {
         var t = this;
 
