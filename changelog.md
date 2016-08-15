@@ -1,7 +1,8 @@
 ﻿
 # 1.11
 
-- ...
+- Pulled updates from the upstream (v1.11, [read more](https://github.com/dmester/sffjs/releases)).
+- Added the ability to run the tests on Node.js.
 
 # 1.10 (fork)
 
