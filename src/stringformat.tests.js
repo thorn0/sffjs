@@ -28,10 +28,11 @@
  *
  */
 /*jshint -W045:true, undef:true, browser:true, node:true*/
-/*global sffjs,require*/
+/*global sffjs*/
 (function() {
     "use strict";
-    var browser = typeof window !== 'undefined';
+    var browser = typeof window !== 'undefined',
+        dotNetStringFormat;
 
     if (!browser) {
         global.sffjs = require('./stringformat');
@@ -39,6 +40,10 @@
         require('./cultures/stringformat.sv');
         require('./cultures/stringformat.uk');
         sffjs.unsafe();
+
+        if (process.platform === 'win32' && process.argv[2] === 'dotnet') {
+            dotNetStringFormat = require('../checker/checker');
+        }
     }
 
     /// <summary>
@@ -46,7 +51,10 @@
     /// </summary>
 
     function runTests(test) {
-        sffjs.setCulture("en");
+        if (browser) {
+            // In the browser, sffjs tries to get the culture from the properties of the navigator object
+            sffjs.setCulture('en');
+        }
 
         var testObject = {
             a: "b",
@@ -540,8 +548,6 @@
         };
 
         this.printInNonBrowserEnv = function() {
-            console.log(String.format("{0} of {1} tests passed", this.numPassedTests, this.numTests));
-
             for (var si in t.sections) {
                 var section = t.sections[si];
                 var sectionNamePrinted = false;
@@ -559,6 +565,7 @@
                     console.log();
                 }
             }
+            console.log(String.format("{0} of {1} tests passed", this.numPassedTests, this.numTests));
         };
     }
 
@@ -647,6 +654,21 @@
             } catch (e) {
                 registerTestResult(message, "Exception: " + e);
                 return;
+            }
+
+            if (dotNetStringFormat) {
+                var dotNetActual;
+                try {
+                    dotNetActual = dotNetStringFormat.apply(null, args);
+                } catch (e) {
+                    registerTestResult(message, ".NET: " + e);
+                    return;
+                }
+                var sameResult = dotNetActual === actual;
+                if (!sameResult) {
+                    registerTestResult(message, String.format(".NET: {0}, actual: {1}", stringify(dotNetActual), stringify(actual)));
+                    return;
+                }
             }
 
             message = String.format("{0,-25}  {1}", formatString, actual);

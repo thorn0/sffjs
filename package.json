@@ -30,6 +30,7 @@
     "load-grunt-tasks": "^3.5.2"
   },
   "scripts": {
-    "test": "node src/stringformat.tests"
+    "test": "node src/stringformat.tests",
+    "dotnet": "node src/stringformat.tests dotnet"
   }
 }
