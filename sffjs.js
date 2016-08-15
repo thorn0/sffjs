@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript, version 1.10.0
+ * String.format for JavaScript, version 1.11.1
  *
  * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
@@ -27,7 +27,7 @@
  *
  */
 /* global sffjs:true, module, define */
-/* jshint curly:false, eqeqeq:true */
+/* jshint curly:false, eqeqeq:true, eqnull:true, -W053:true */
 (function(factory) {
 
     if (typeof module !== 'undefined' && module.exports) {
@@ -43,6 +43,7 @@
     }
 
 }).call(this, function() {
+    "use strict";
 
     // ***** Private Variables *****
 
@@ -328,52 +329,119 @@
             integralDigits = -1,
             decimals = 0,
             forcedDecimals = -1,
+
+            thousandsMultiplier = 1,
+
             atDecimals = 0, // Bool
             unused = 1, // Bool, True until a digit has been written to the output
-            c, i, f,
-            format_length = format.length,
+
+            tokens = [],
+            tokenGroups = [tokens],
+
+            currentToken,
+            numberIndex,
+            formatIndex,
             endIndex,
+
             out = [];
 
-        // Analyse format string
-        // Count number of digits, decimals, forced digits and forced decimals.
-        for (i = 0; i < format_length; i++) {
-            c = format.charAt(i);
+        // Tokenize format string.
+        // Constants are represented with String instances, while all other tokens are represented with
+        // string literals.
+        for (formatIndex = 0; formatIndex < format.length; formatIndex++) {
+            currentToken = format.charAt(formatIndex);
 
             // Check if we have reached a literal
-            if (c === "'" || c === '"') {
+            if (currentToken === "'" || currentToken === '"') {
 
-                // Search for end of literal
-                i = format.indexOf(c, i + 1);
+                // Find end of literal
+                endIndex = format.indexOf(currentToken, formatIndex + 1);
+
+                // String instances are used to represent constants
+                tokens.push(new String(
+                    format.substring(
+                        formatIndex + 1,
+                        endIndex < 0 ? undefined : endIndex // assume rest of string if matching quotation mark is missing
+                    )));
 
                 // If there is no matching end quotation mark, let's assume the rest of the string is a literal.
                 // This is the way .NET handles things.
-                if (i < 0) break;
+                if (endIndex < 0) break;
+
+                formatIndex = endIndex;
 
                 // Check for single escaped character
-            } else if (c === "\\") {
-                i++;
+            } else if (currentToken === "\\") {
+                // String instances are used to represent constants
+                tokens.push(new String(format.charAt(++formatIndex)));
 
-            } else {
+            } else if (currentToken === ";") {
 
-                // Only 0 and # are digit placeholders, skip other characters in analyzing phase
-                if (c === "0" || c === "#") {
-                    decimals += atDecimals;
-
-                    if (c === "0") {
-                        // 0 is a forced digit
-                        if (atDecimals) {
-                            forcedDecimals = decimals;
-                        } else if (forcedDigits < 0) {
-                            forcedDigits = digits;
-                        }
-                    }
-
-                    digits += !atDecimals;
+                // Short circuit tokenizer
+                if (number > 0 || // No need to parse any more groups if the number is positive since the first group is for positive numbers
+                    number < 0 && tokenGroups.length > 1) { // Dito for negative numbers which is specified in the second group
+                    break;
                 }
 
-                // If the current character is ".", then we have reached the end of the integral part
-                atDecimals = atDecimals || c === ".";
+                // Begin a new token group
+                tokenGroups.push(tokens = []);
+
+            } else {
+                tokens.push(currentToken);
+            }
+        }
+
+        // Determine which token group to be used ( positive; negative; zero, where the two last ones are optional)
+        if (number < 0 && tokenGroups.length > 1) {
+            number *= -1;
+            format = tokenGroups[1];
+        } else {
+            format = tokenGroups[!number && tokenGroups.length > 2 ? 2 : 0];
+        }
+
+        // Analyse format string
+        // Count number of digits, decimals, forced digits and forced decimals.
+        for (formatIndex = 0; formatIndex < format.length; formatIndex++) {
+            currentToken = format[formatIndex];
+
+            // Only handle digit placeholders and number multipliers during analysis phase
+            if (currentToken === "0" || currentToken === "#") {
+                decimals += atDecimals;
+
+                if (currentToken === "0") {
+                    // 0 is a forced digit
+                    if (atDecimals) {
+                        forcedDecimals = decimals;
+                    } else if (forcedDigits < 0) {
+                        forcedDigits = digits;
+                    }
+                }
+
+                // If a comma specifier is specified before the last integral digit
+                // it indicates thousand grouping.
+                if (thousandsMultiplier !== 1 && !atDecimals) {
+                    // Set thousand separator
+                    out.t = thousandSeparator;
+                    thousandsMultiplier = 1;
+                }
+
+                digits += !atDecimals;
+            }
+
+            // End of integral part
+            else if (currentToken === ".") {
+                atDecimals = 1;
+            }
+
+            // Comma specifier used for both thousand grouping and scaling.
+            // It is only effective if specified before the explicit or implicit decimal point.
+            else if (currentToken === "," && !atDecimals && digits > 0) {
+                thousandsMultiplier *= 0.001;
+            }
+
+            // Percent
+            else if (currentToken === "%") {
+                number *= 100;
             }
         }
         forcedDigits = forcedDigits < 0 ? 1 : digits - forcedDigits;
@@ -384,74 +452,53 @@
         }
 
         // Round the number value to a specified number of decimals
-        number = numberToString(number, decimals);
+        number = numberToString(number * thousandsMultiplier, decimals);
 
         // Get integral length
         integralDigits = numberOfIntegralDigits(number);
 
         // Set initial number cursor position
-        i = integralDigits - digits;
+        numberIndex = integralDigits - digits;
 
         // Initialize thousand grouping
         out.g = Math.max(integralDigits, forcedDigits);
-        out.t = thousandSeparator;
 
-        for (f = 0; f < format_length; f++) {
-            c = format.charAt(f);
+        for (formatIndex = 0; formatIndex < format.length; formatIndex++) {
+            currentToken = format[formatIndex];
 
-            // Check if we have reached a literal
-            if (c === "'" || c === '"') {
-
-                // Find end of literal
-                endIndex = format.indexOf(c, f + 1);
-
-                out.push(
-                    format.substring(
-                        f + 1,
-                        endIndex < 0 ? format.length : endIndex // assume rest of string if matching quotation mark is missing
-                    ));
-
-                if (endIndex < 0) break;
-                f = endIndex;
-
-                // Single escaped character
-            } else if (c === "\\") {
-                out.push(format.charAt(f + 1));
-                f++;
-
-                // Digit placeholder
-            } else if (c === "#" || c === "0") {
-                if (i < integralDigits) {
+            // Digit placeholder
+            if (currentToken === "#" || currentToken === "0") {
+                if (numberIndex < integralDigits) {
                     // In the integral part
-                    if (i >= 0) {
+                    if (numberIndex >= 0) {
                         if (unused) {
-                            groupedAppend(out, number.substr(0, i));
+                            groupedAppend(out, number.substr(0, numberIndex));
                         }
-                        groupedAppend(out, number.charAt(i));
+                        groupedAppend(out, number.charAt(numberIndex));
 
                         // Not yet inside the number number, force a zero?
-                    } else if (i >= integralDigits - forcedDigits) {
+                    } else if (numberIndex >= integralDigits - forcedDigits) {
                         groupedAppend(out, "0");
                     }
 
                     unused = 0;
 
-                } else if (forcedDecimals-- > 0 || i < number.length) {
+                } else if (forcedDecimals-- > 0 || numberIndex < number.length) {
                     // In the fractional part
-                    groupedAppend(out, i >= number.length ? "0" : number.charAt(i));
+                    groupedAppend(out, numberIndex >= number.length ? "0" : number.charAt(numberIndex));
                 }
 
-                i++;
+                numberIndex++;
 
                 // Radix point character according to current culture.
-            } else if (c === ".") {
-                if (number.length > ++i || forcedDecimals > 0) {
+            } else if (currentToken === ".") {
+                if (number.length > ++numberIndex || forcedDecimals > 0) {
                     out.push(radixPoint);
                 }
 
                 // Other characters are written as they are, except from commas
-            } else if (c !== ",") {
-                out.push(c);
+            } else if (currentToken !== ",") {
+                out.push(currentToken);
             }
         }
 
@@ -631,27 +678,7 @@
         }
 
         // EVALUATE CUSTOM NUMERIC FORMAT STRING
-
-        // Thousands
-        if (format.indexOf(",.") !== -1) {
-            number /= 1000;
-        }
-
-        // Percent
-        if (format.indexOf("%") !== -1) {
-            number *= 100;
-        }
-
-        // Split groups ( positive; negative; zero, where the two last ones are optional)
-        var groups = format.split(";");
-        if (number < 0 && groups.length > 1) {
-            number *= -1;
-            format = groups[1];
-        } else {
-            format = groups[!number && groups.length > 2 ? 2 : 0];
-        }
-
-        return customNumberFormatter(number, format, radixPoint, format.match(/^[^\.]*[0#],[0#]/) && thousandSeparator);
+        return customNumberFormatter(number, format, radixPoint, thousandSeparator);
     }
 
     // ***** Date Formatting *****
@@ -774,7 +801,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.10.0";
+    sffjs.version = "1.11.1";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>

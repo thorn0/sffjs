@@ -27,33 +27,46 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
-/*global sffjs,require*/
+/*jshint -W045:true, undef:true, browser:true, node:true*/
+/*global sffjs*/
 (function() {
+    "use strict";
+    var browser = typeof window !== 'undefined',
+        dotNetStringFormat;
+
+    if (!browser) {
+        global.sffjs = require('./stringformat');
+        require('./cultures/stringformat.en-US');
+        require('./cultures/stringformat.sv');
+        require('./cultures/stringformat.uk');
+        sffjs.unsafe();
+
+        if (process.platform === 'win32' && process.argv[2] === 'dotnet') {
+            dotNetStringFormat = require('../checker/checker');
+        }
+    }
+
     /// <summary>
     ///     Performs a series of unit tests and writes the output to the page.
     /// </summary>
 
     function runTests(test) {
-        sffjs.setCulture("en");
+        if (browser) {
+            // In the browser, sffjs tries to get the culture from the properties of the navigator object
+            sffjs.setCulture('en');
+        }
 
         var testObject = {
             a: "b",
-            authors: [
-                {
+            authors: [{
                 firstname: "John",
                 lastname: "Doe",
-                    phonenumbers: [
-                        {
-                            home: "012",
-                    home: "345"
-                        }
-                    ],
+                phonenumbers: [{
+                    home: "012"
+                }],
                 age: 27
-                }
-            ]
+            }]
         };
-
-        var undefined;
 
         test.section("Tags");
         assert.formatsTo("Test {with} brackets", "Test {{with}} brackets");
@@ -68,7 +81,7 @@
         assert.formatsTo("!true!", "!{0}!", true);
         assert.formatsTo("null:!!", "null:!{0}!", null);
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
-        assert.doesThrow(function () { String.format("{1}", 42) }, "Missing argument", "Index out of range");
+        assert.doesThrow(function() { String.format("{1}", 42); }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
 
         test.section("Path");
@@ -103,10 +116,10 @@
         assert.formatsTo("4}.2", "{0:0}}.0}", 4.2);
         assert.formatsTo("4{.2", "{0:0{{.0}", 4.2);
         assert.formatsTo("4}{{}.2", "{0:0}}{{{{}}.0}", 4.2);
-        // * These tests do not produce the same output as in .NET. In .NET these format strings will 
+        // * These tests do not produce the same output as in .NET. In .NET these format strings will
         // generate a FormatException while the JS implementation makes a best effort to finish processing
         // the format string.
-        
+
         var dtam = new Date(1989, 3, 2, 6, 20, 33);
         var dtpm = new Date(1989, 3, 2, 18, 20, 33);
         var dt2009 = new Date(2009, 3, 2, 18, 20, 33);
@@ -195,10 +208,16 @@
         assert.formatsTo("pos", "{0:pos;neg}", 5);
         assert.formatsTo("neg", "{0:pos;neg}", -5);
         assert.formatsTo("pos", "{0:pos;neg}", 0);
+        assert.formatsTo("pos;", "{0:pos';';neg';'}", 5);
+        assert.formatsTo("neg;", "{0:pos';';neg';'}", -5);
+        assert.formatsTo("pos;", "{0:pos';';neg';'}", 0);
 
         assert.formatsTo("pos", "{0:pos;neg;zero}", 5);
         assert.formatsTo("neg", "{0:pos;neg;zero}", -5);
         assert.formatsTo("zero", "{0:pos;neg;zero}", 0);
+        assert.formatsTo("pos", "{0:pos;neg;zero';'}", 5);
+        assert.formatsTo("neg", "{0:pos;neg;zero';'}", -5);
+        assert.formatsTo("zero;", "{0:pos;neg;zero';'}", 0);
 
         test.section("Simple numeric format strings");
         assert.formatsTo("0.42", "{0}", 0.42);
@@ -206,8 +225,6 @@
 
         test.section("Custom numeric format strings");
         assert.formatsTo("4", "{0:0}", 4.42);
-        assert.formatsTo("42%", "{0:0%}", 0.42);
-        assert.formatsTo("42.01%", "{0:0.00%}", 0.42009);
         assert.formatsTo("42.01d", "{0:0.00d}", 42.009);
         assert.formatsTo("42.01", "{0:0.0#}", 42.009);
         assert.formatsTo("42.0", "{0:0.0#}", 42.001);
@@ -219,8 +236,25 @@
         assert.formatsTo("042.50", "{0:000.#0}", 42.5);
         assert.formatsTo("042.5", "{0:000.0#}", 42.5);
         assert.formatsTo("042.5000000000000000000000000", "{0:000.0000000000000000000000000}", 42.5);
-
         assert.formatsTo("1098#234.0", "{0:0'098#'000.0#}", 1234);
+
+        test.section("Custom numeric format strings - percent");
+        assert.formatsTo("42%", "{0:0%}", 0.42);
+        assert.formatsTo("4200%%", "{0:0%%}", 0.42);
+        assert.formatsTo("4%", "{0:0'%'}", 4.2);
+        assert.formatsTo("4%", "{0:0\\%}", 4.2);
+        assert.formatsTo("42.01%", "{0:0.00%}", 0.42009);
+
+        test.section("Custom numeric format strings - thousands separator and scaling");
+        assert.formatsTo("4200", "{0:,0,}", 4200000);
+        assert.formatsTo("4,200", "{0:#,0,}", 4200000);
+        assert.formatsTo("4", "{0:#,0,,}", 4200000);
+        assert.formatsTo("4.2", "{0:0,,.0}", 4200000);
+        assert.formatsTo("4.2", "{0:#,0,,.0}", 4200000);
+        assert.formatsTo("4200.0", "{0:0.,0}", 4200);
+        assert.formatsTo("4200,", "{0:0\\,.}", 4200);
+        assert.formatsTo("4.", "{0:0,\\.}", 4200);
+        assert.formatsTo("4200,.", "{0:0',.'}", 4200);
 
         test.section("Specifier D");
         assert.formatsTo("43", "{0:d}", 42.5);
@@ -318,7 +352,7 @@
         sffjs.setCulture("sv-SE");
         assert.formatsTo("1,2e+03", "{0:g2}", 1242.55);
         assert.formatsTo("1242,50", "{0:f}", 1242.5);
-        assert.formatsTo("1 242,500", "{0:N3}", 1242.5);
+        assert.formatsTo("1 242,500", "{0:N3}", 1242.5);
 
         assert.formatsTo("2353", "{0:R}", 2353);
         assert.formatsTo("25.3333333", "{0:R}", 25.3333333);
@@ -403,11 +437,12 @@
         sffjs.setCulture("");
     }
 
-    
+    var currentTest;
+
     function Test() {
         var t = this;
 
-        window.currentTest = this;
+        currentTest = this;
         this.sections = [];
 
         this.section = function(name) {
@@ -426,26 +461,32 @@
         };
 
         this.print = function() {
-            var container = document.createElement("div");
+            this.numTests = 0;
+            this.numPassedTests = 0;
 
-            var numTests = 0;
-            var numPassedTests = 0;
-
-            var si, ri;
-
-            for (si in this.sections) {
-                for (ri in this.sections[si].results) {
-                    numTests++;
+            for (var si in this.sections) {
+                for (var ri in this.sections[si].results) {
+                    this.numTests++;
                     if (this.sections[si].results[ri].result) {
-                        numPassedTests++;
+                        this.numPassedTests++;
                     }
                 }
             }
 
+            if (browser) {
+                this.printInBrowser();
+            } else {
+                this.printInNonBrowserEnv();
+            }
+        };
+
+        this.printInBrowser = function() {
+            var container = document.createElement("div");
+
             var totalResult = document.createElement("div");
-            totalResult.className = (numPassedTests == numTests ? "pass" : "fail") + " total-result";
-            totalResult.innerHTML = String.format("<em>{0}</em> of <em>{1}</em> tests passed", numPassedTests, numTests);
-            totalResult.setAttribute("data-percent", Math.round(100 * numPassedTests / numTests));
+            totalResult.className = (this.numPassedTests == this.numTests ? "pass" : "fail") + " total-result";
+            totalResult.innerHTML = String.format("<em>{0}</em> of <em>{1}</em> tests passed", this.numPassedTests, this.numTests);
+            totalResult.setAttribute("data-percent", Math.round(100 * this.numPassedTests / this.numTests));
             container.appendChild(totalResult);
 
             var progressBar = document.createElement("div");
@@ -453,7 +494,7 @@
             progressBar.style.width = "200px";
 
             var progress = document.createElement("span");
-            progress.style.width = Math.round(100 * numPassedTests / numTests) + "%";
+            progress.style.width = Math.round(100 * this.numPassedTests / this.numTests) + "%";
             progressBar.appendChild(progress);
             totalResult.appendChild(progressBar);
 
@@ -467,7 +508,7 @@
                 return tr;
             }
 
-            for (si in t.sections) {
+            for (var si in t.sections) {
                 var section = t.sections[si];
 
                 tr = createRow();
@@ -476,7 +517,7 @@
                 td.appendChild(document.createTextNode(section.name));
                 tr.appendChild(td);
 
-                for (ri in section.results) {
+                for (var ri in section.results) {
                     var result = section.results[ri];
 
                     tr = createRow();
@@ -505,11 +546,32 @@
 
             document.body.appendChild(container);
         };
+
+        this.printInNonBrowserEnv = function() {
+            for (var si in t.sections) {
+                var section = t.sections[si];
+                var sectionNamePrinted = false;
+                for (var ri in section.results) {
+                    var result = section.results[ri];
+                    if (!result.result) {
+                        if (!sectionNamePrinted) {
+                            console.log(section.name);
+                            sectionNamePrinted = true;
+                        }
+                        console.log(result.result ? "PASS:" : "FAIL:", result.message, '\t', result.errorMessage);
+                    }
+                }
+                if (sectionNamePrinted) {
+                    console.log();
+                }
+            }
+            console.log(String.format("{0} of {1} tests passed", this.numPassedTests, this.numTests));
+        };
     }
 
     function registerTestResult(message, errorMessage) {
-        if (window.currentTest) {
-            window.currentTest.result({
+        if (currentTest) {
+            currentTest.result({
                 message: message,
                 result: !errorMessage,
                 errorMessage: errorMessage
@@ -594,16 +656,26 @@
                 return;
             }
 
+            if (dotNetStringFormat) {
+                var dotNetActual;
+                try {
+                    dotNetActual = dotNetStringFormat.apply(null, args);
+                } catch (e) {
+                    registerTestResult(message, ".NET: " + e);
+                    return;
+                }
+                var sameResult = dotNetActual === actual;
+                if (!sameResult) {
+                    registerTestResult(message, String.format(".NET: {0}, actual: {1}", stringify(dotNetActual), stringify(actual)));
+                    return;
+                }
+            }
+
             message = String.format("{0,-25}  {1}", formatString, actual);
 
             assert.areEqual(expected, actual, message);
         }
     };
-
-    if (typeof window === 'undefined') {
-        // node.js TBD
-        String.format = require('../src/sffjs');
-    }
 
     var s = String.format;
     var formats = 0;
@@ -617,8 +689,14 @@
     runTests(test);
     var endTime = new Date().valueOf();
     test.print();
-    var timeResult = document.createElement("div");
-    timeResult.innerHTML = String.format("Executed in {0:0} ms, mean {1:0.00} µs/format", endTime - startTime, 1000 * (endTime - startTime) / formats);
-    document.body.appendChild(timeResult);
-    document.body.appendChild(timeResult);
+
+    var timeResultString = String.format("Executed in {0:0} ms, mean {1:0.00} µs/format", endTime - startTime, 1000 * (endTime - startTime) / formats);
+
+    if (browser) {
+        var timeResult = document.createElement("div");
+        timeResult.innerHTML = timeResultString;
+        document.body.appendChild(timeResult);
+    } else {
+        console.log(timeResultString);
+    }
 })();
