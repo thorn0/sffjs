@@ -38,19 +38,15 @@
 
         var testObject = {
             a: "b",
-            authors: [
-                {
+            authors: [{
                 firstname: "John",
                 lastname: "Doe",
-                    phonenumbers: [
-                        {
-                            home: "012",
+                phonenumbers: [{
+                    home: "012",
                     home: "345"
-                        }
-                    ],
+                }],
                 age: 27
-                }
-            ]
+            }]
         };
 
         var undefined;
@@ -70,7 +66,6 @@
         assert.formatsTo("undefined:!!", "undefined:!{0}!", undefined);
         assert.doesThrow(function() { String.format("{1}", 42) }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
-
 
         test.section("Path");
         assert.formatsTo("Hi, John!", "Hi, {authors[0].firstname}!", testObject);
