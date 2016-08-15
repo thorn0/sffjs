@@ -43,6 +43,7 @@
     }
 
 }).call(this, function() {
+    "use strict";
 
     // ***** Private Variables *****
 
