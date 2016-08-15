@@ -27,7 +27,7 @@
  *
  */
 /* global sffjs:true, module, define */
-/* jshint curly:false, eqeqeq:true */
+/* jshint curly:false, eqeqeq:true, eqnull:true, -W053:true */
 (function(factory) {
 
     if (typeof module !== 'undefined' && module.exports) {
@@ -407,7 +407,7 @@
             if (currentToken === "0" || currentToken === "#") {
                 decimals += atDecimals;
 
-                if (currentToken == "0") {
+                if (currentToken === "0") {
                     // 0 is a forced digit
                     if (atDecimals) {
                         forcedDecimals = decimals;
@@ -418,7 +418,7 @@
 
                 // If a comma specifier is specified before the last integral digit
                 // it indicates thousand grouping.
-                if (thousandsMultiplier != 1 && !atDecimals) {
+                if (thousandsMultiplier !== 1 && !atDecimals) {
                     // Set thousand separator
                     out.t = thousandSeparator;
                     thousandsMultiplier = 1;
