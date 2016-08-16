@@ -50,14 +50,40 @@ function unicodeEscape(string) {
         .join("");
 }
 
+function jsonReplacer(key, value) {
+    if (typeof value === 'number') {
+        var code;
+        if (value === Infinity) {
+            code = 'Infinity';
+        } else if (value === -Infinity) {
+            code = '-Infinity';
+        } else if (Number.isNaN(value)) {
+            code = 'NaN';
+        }
+        if (code) {
+            return {
+                __type: 'special',
+                kind: 'number',
+                value: code
+            };
+        }
+    }
+    if (value instanceof Date) {
+        return {
+            __type: 'special',
+            kind: 'datetime',
+            value: value.valueOf()
+        };
+    }
+    return value;
+}
+
 function stringifyJsonCommandLineArgument(arg) {
     var originalPrototypeDateToJSON = Date.prototype.toJSON;
     Date.prototype.toJSON = function() {
-        return '/Date(' + (this.valueOf() - this.getTimezoneOffset() * 60000) + ')/'; // FIXME
+        return this;
     };
-    var argJson = unicodeEscape(JSON.stringify(arg))
-        .replace(/(\/Date\(\d+\))\//g, '\\$1\\/')
-        .replace(/\\\\/g, '\\u005c');
+    var argJson = unicodeEscape(JSON.stringify(arg, jsonReplacer)).replace(/\\\\/g, '\\u005c');
     Date.prototype.toJSON = originalPrototypeDateToJSON;
     return argJson;
 }
