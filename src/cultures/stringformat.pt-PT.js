@@ -12,8 +12,6 @@
         name: "pt-PT",
         d: "dd-MM-yyyy",
         D: "dddd, d' de 'MMMM' de 'yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "d/M",
         Y: "MMMM' de 'yyyy",
         _am: "a.m.",

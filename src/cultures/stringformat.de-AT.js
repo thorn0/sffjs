@@ -12,8 +12,6 @@
         name: "de-AT",
         d: "dd.MM.yyyy",
         D: "dddd, dd. MMMM yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "dd MMMM",
         Y: "MMMM yyyy",
         _am: "vorm.",

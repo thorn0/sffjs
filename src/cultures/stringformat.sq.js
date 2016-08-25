@@ -14,7 +14,6 @@
         D: "yyyy-MM-dd",
         t: "h:mm.tt",
         T: "h:mm:ss.tt",
-        M: "MMMM dd",
         Y: "yyyy-MM",
         _am: "PD",
         _pm: "MD",

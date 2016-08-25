@@ -10,11 +10,9 @@
 }(this, function (sffjs) { 'use strict';
     sffjs.registerCulture({
         name: "fa",
-        d: "MM/dd/yyyy",
         D: "dddd, MMMM dd, yyyy",
         t: "hh:mm tt",
         T: "hh:mm:ss tt",
-        M: "MMMM dd",
         Y: "MMMM, yyyy",
         _am: "قبل‌ازظهر",
         _pm: "بعدازظهر",

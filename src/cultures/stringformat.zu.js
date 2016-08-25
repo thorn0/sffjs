@@ -16,8 +16,6 @@
         T: "hh:mm:ss tt",
         M: "dd MMMM",
         Y: "MMMM yyyy",
-        _am: "AM",
-        _pm: "PM",
         _r: ",",
         _t: " ",
         _c: "#,0.00 'R'",

@@ -10,7 +10,6 @@
         D: "d MMMM yyyy 'г.'",
         t: "H:mm",
         T: "H:mm:ss",
-        M: "MMMM dd",
         Y: "MMMM yyyy",
         _am: "",
         _pm: "",

@@ -12,8 +12,6 @@
         name: "se",
         d: "dd.MM.yyyy",
         D: "MMMM d'. b. 'yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "MMMM d'. b. '",
         Y: "MMMM yyyy",
         _am: "i.b.",

@@ -12,8 +12,6 @@
         name: "nn",
         d: "dd.MM.yyyy",
         D: "d. MMMM yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "d. MMMM",
         Y: "MMMM yyyy",
         _am: "f.m.",

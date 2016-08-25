@@ -13,7 +13,6 @@
         d: "yyyy-MM-dd",
         D: "d MMMM yyyy",
         t: "H:mm tt",
-        T: "HH:mm:ss",
         M: "'ថ្ងៃទី' dd 'ខែ' MM",
         Y: "'ខែ' MM 'ឆ្នាំ' yyyy",
         _am: "ព្រឹក",

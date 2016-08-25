@@ -19,7 +19,6 @@
         _am: "pg",
         _pm: "ptg",
         _r: ",",
-        _t: ",",
         _c: "'RM'#,0.00",
         _d: ["Ahd", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"],
         _D: ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"],

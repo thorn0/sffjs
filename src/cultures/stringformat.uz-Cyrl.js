@@ -12,8 +12,6 @@
         name: "uz-Cyrl",
         d: "dd.MM.yyyy",
         D: "yyyy 'йил' d-MMMM",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "d-MMMM",
         Y: "MMMM yyyy",
         _am: "",

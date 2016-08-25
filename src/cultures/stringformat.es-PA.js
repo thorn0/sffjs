@@ -10,7 +10,6 @@
 }(this, function (sffjs) { 'use strict';
     sffjs.registerCulture({
         name: "es-PA",
-        d: "MM/dd/yyyy",
         D: "dddd, dd' de 'MMMM' de 'yyyy",
         t: "hh:mm tt",
         T: "hh:mm:ss tt",

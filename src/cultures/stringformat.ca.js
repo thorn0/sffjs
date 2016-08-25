@@ -12,8 +12,6 @@
         name: "ca",
         d: "dd/MM/yyyy",
         D: "dddd, d' / 'MMMM' / 'yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "dd MMMM",
         Y: "MMMM' / 'yyyy",
         _am: "a.m.",

@@ -12,8 +12,6 @@
         name: "sv-FI",
         d: "d.M.yyyy",
         D: "'den 'd MMMM yyyy",
-        t: "HH:mm",
-        T: "HH:mm:ss",
         M: "'den 'd MMMM",
         Y: "MMMM yyyy",
         _am: "FM",
