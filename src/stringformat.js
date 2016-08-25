@@ -110,6 +110,13 @@
     function fillGapsInCulture(culture) {
         /// <summary>This method will fill gaps in the specified culture with information from the invariant culture.</summary>
 
+        if (culture._cr == null) {
+            culture._cr = culture._r;
+        }
+        if (culture._ct == null) {
+            culture._ct = culture._t;
+        }
+
         // Add missing formats from the culture template
         for (var key in CULTURE_TEMPLATE) {
             if (culture[key] == null) {

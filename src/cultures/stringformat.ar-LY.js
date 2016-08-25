@@ -2,24 +2,28 @@
 // licensed under the terms of the MIT X11 license.
 // See: http://www.mono-project.com/FAQ:_Licensing
 
-sffjs.registerCulture({
-    name: "ar-LY",
-    d: "dd/MM/yyyy",
-    D: "dd MMMM, yyyy",
-    t: "hh:mm tt",
-    T: "hh:mm:ss tt",
-    M: "dd MMMM",
-    Y: "MMMM, yyyy",
-    _am: "",
-    _pm: "",
-    _r: "٫",
-    _cr: "٫",
-    _t: "٬",
-    _ct: "٬",
-    _c: "\u0027د.ل.‏\u0027#,0.00",
-    _d: ["","","","","","",""],
-    _D: ["","","","","","",""],
-    _m: ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة",""],
-    _M: ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة",""]
-});
-
+;(function (global, factory) {
+   typeof exports === 'object' && typeof module !== 'undefined'
+       && typeof require === 'function' ? factory(require('../sffjs')) :
+   typeof define === 'function' && define.amd ? define(['../sffjs'], factory) :
+   factory(global.sffjs)
+}(this, function (sffjs) { 'use strict';
+    sffjs.registerCulture({
+        name: "ar-LY",
+        d: "dd/MM/yyyy",
+        D: "dd MMMM, yyyy",
+        t: "hh:mm tt",
+        T: "hh:mm:ss tt",
+        M: "dd MMMM",
+        Y: "MMMM, yyyy",
+        _am: "",
+        _pm: "",
+        _r: "٫",
+        _t: "٬",
+        _c: "'د.ل.‏'#,0.00",
+        _d: ["", "", "", "", "", "", ""],
+        _D: ["", "", "", "", "", "", ""],
+        _m: ["محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"],
+        _M: ["محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"]
+    });
+}));
