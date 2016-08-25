@@ -26,9 +26,9 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
-/* global sffjs:true, module, define */
-/* jshint curly:false, eqeqeq:true, eqnull:true, -W053:true */
-(function(factory) {
+/* global module, define */
+/* jshint curly:false, eqeqeq:true, eqnull:true, -W053:true, browser:false, node:false */
+(function(global, factory) {
 
     if (typeof module !== 'undefined' && module.exports) {
         // CommonJS
@@ -38,11 +38,11 @@
         define(factory);
     } else {
         // global
-        sffjs = factory();
-        sffjs.unsafe();
+        global.sffjs = factory();
+        global.sffjs.unsafe();
     }
 
-}).call(this, function() {
+})(this, function() {
     "use strict";
 
     // ***** Private Variables *****
@@ -77,7 +77,7 @@
 
         // Holds the id of the current culture. The id is also included in the culture object, but the
         // culture object might be replaced during runtime when a better matching culture is registered.
-        currentCultureId = typeof navigator !== 'undefined' && (navigator.systemLanguage || navigator.language) || "",
+        currentCultureId = typeof navigator !== 'undefined' && normalizeCulture(navigator.systemLanguage || navigator.language) || "",
 
         // Holds all registered external cultures, i.e. not the invariant culture
         cultures = {};
@@ -137,12 +137,45 @@
         return culture;
     }
 
+    function normalizeCulture(key) {
+        return key ? key.toLowerCase().replace('_', '-') : key;
+    }
+
+    function getCultureAndItsParents(key) {
+        var result = [key];
+        var parts = key.split('-');
+        if (parts.length > 1) {
+            while (--parts.length) {
+                result.push(parts.join('-'));
+            }
+        }
+        return result;
+    }
+
+    var ensureCultureLoaded;
+    if (typeof module !== 'undefined' && module.exports) {
+        ensureCultureLoaded = function(key) {
+            if (!(key in cultures)) {
+                cultures[key] = false;
+                try {
+                    require('./cultures/stringformat.' + key);
+                } catch (e) {}
+            }
+        };
+    }
+
     function updateCulture() {
         /// <summary>This method will update the currently selected culture object to reflect the currently set LCID (as far as possible).</summary>
         var result;
         if (currentCultureId) {
-            var currentCultureIdUpperCase = currentCultureId.toUpperCase();
-            result = cultures[currentCultureIdUpperCase] || cultures[currentCultureIdUpperCase.split("-")[0]];
+            var ids = getCultureAndItsParents(currentCultureId);
+            for (var i = 0; !result && i < ids.length; i++) {
+                var id = ids[i];
+                if (ensureCultureLoaded) {
+                    ensureCultureLoaded(id);
+                }
+                result = cultures[id];
+            }
         }
         sffjs.LC = currentCulture = result || INVARIANT_CULTURE;
     }
@@ -816,7 +849,7 @@
         /// </summary>
         /// <param name="LCID">The IETF language code of the culture, e.g. en-US or en.</param>
 
-        currentCultureId = languageCode;
+        currentCultureId = normalizeCulture(languageCode);
         updateCulture();
     };
 
@@ -825,7 +858,7 @@
         ///     Registers an object containing information about a culture.
         /// </summary>
 
-        cultures[culture.name.toUpperCase()] = fillGapsInCulture(culture);
+        cultures[normalizeCulture(culture.name)] = fillGapsInCulture(culture);
 
         // ...and reevaulate current culture
         updateCulture();

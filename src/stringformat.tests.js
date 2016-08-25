@@ -36,9 +36,6 @@
 
     if (!browser) {
         global.sffjs = require('./stringformat');
-        require('./cultures/stringformat.en-US');
-        require('./cultures/stringformat.sv');
-        require('./cultures/stringformat.uk');
         sffjs.unsafe();
 
         if (process.platform === 'win32' && process.argv[2] === 'dotnet') {
@@ -601,6 +598,10 @@
                     return value.format("yyyy-MM-ddTHH:mm:ss");
                 }
 
+                if (value instanceof Error) {
+                    return value.toString();
+                }
+
                 var first = true;
                 var s = "{ ";
 
@@ -661,7 +662,7 @@
                 try {
                     dotNetActual = dotNetStringFormat.apply(null, args);
                 } catch (e) {
-                    registerTestResult(message, ".NET: " + e);
+                    registerTestResult(message, String.format(".NET: <<{0}>>, actual: {1}", stringify(e), stringify(actual)));
                     return;
                 }
                 var sameResult = dotNetActual === actual;
