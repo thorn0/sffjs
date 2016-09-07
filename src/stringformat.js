@@ -144,10 +144,8 @@
     function getCultureAndItsParents(key) {
         var result = [key];
         var parts = key.split('-');
-        if (parts.length > 1) {
-            while (--parts.length) {
-                result.push(parts.join('-'));
-            }
+        while (--parts.length) {
+            result.push(parts.join('-'));
         }
         return result;
     }
@@ -274,7 +272,7 @@
             // Index was numerical => ensure index is within range
             if (index > args.length - 2) {
                 // Throw exception if argument is not specified (however undefined and null values are fine!)
-                throw "Missing argument";
+                throw new Error("Missing argument");
             }
 
             value = args[index + 1];
