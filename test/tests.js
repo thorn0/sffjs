@@ -599,7 +599,7 @@
                 }
 
                 if (value instanceof Error) {
-                    return value.toString();
+                    return value.toString().replace(/^Error: /, '');
                 }
 
                 var first = true;
@@ -638,7 +638,7 @@
             try {
                 fn();
             } catch (e) {
-                actualError = e;
+                actualError = stringify(e);
             }
 
             assert.areEqual(expectedError, actualError, message);
@@ -699,5 +699,8 @@
         document.body.appendChild(timeResult);
     } else {
         console.log(timeResultString);
+        if (test.numTests > test.numPassedTests) {
+            process.exit(1);
+        }
     }
 })();
