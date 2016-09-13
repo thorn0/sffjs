@@ -138,7 +138,7 @@
     }
 
     function normalizeCulture(key) {
-        return key ? key.toLowerCase().replace('_', '-') : key;
+        return key ? key.toLowerCase().replace(/_/g, '-') : '';
     }
 
     function getCultureAndItsParents(key) {
