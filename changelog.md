@@ -1,4 +1,7 @@
-﻿
+﻿# 1.12
+
+- Update from the upstream (Bug fix: removed infinity loop when using the G format specifier with a zero value.)
+
 # 1.11
 
 - Pulled updates from the upstream (v1.11, [read more](https://github.com/dmester/sffjs/releases)).

@@ -2,7 +2,7 @@
 ---------------------------------------------------------------------------
 
 String.format for JavaScript
-Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
 Fork by Georgii Dolzhykov
 
 The library core (sffjs.js and sffjs.min.js) is

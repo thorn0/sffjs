@@ -2,7 +2,7 @@
  * Unit tests for
  * String.format for JavaScript
  *
- * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+ * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
  *
  * Fork by Georgii Dolzhykov
