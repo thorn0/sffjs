@@ -28,30 +28,10 @@ culture will be used.
 <script src="cultures/stringformat.sv.js"></script>
 ```
 
-Then you're ready to go. Here are two simple examples using indexes and object
-paths/named parameters.
+Then you're ready to go.
 
 ```js
-// Index
-String.format(
-    "Welcome back, {0}! Last seen {1:M}",
-    "John Doe", new Date(1985, 3, 7, 12, 33)
-);
-
-// Outputs:
-// Welcome back, John Doe! Last seen April 07
-
-// Named parameters
-String.format(
-    "Welcome back, {user.name}! Last seen {lastseen:M}",
-    {
-        user: {
-            name : "John Doe",
-            age : 42
-        },
-        lastseen: new Date(2009, 3, 7, 12, 33)
-    }
-);
+String.format("Welcome back, {0}! Last seen {1:M}", "John Doe", new Date(1985, 3, 7, 12, 33));
 
 // Outputs:
 // Welcome back, John Doe! Last seen April 07
@@ -69,10 +49,7 @@ sffjs.setCulture("sv");
 
 ```js
 var sffjs = require('sffjs');
-console.log(sffjs(
-    "Welcome back, {0}! Last seen {1:M}",
-    "John Doe", new Date(1985, 3, 7, 12, 33)
-));
+console.log(sffjs("Welcome back, {0}! Last seen {1:M}", "John Doe", new Date(1985, 3, 7, 12, 33)));
 
 // Outputs:
 // Welcome back, John Doe! Last seen April 07
@@ -83,7 +60,7 @@ Built-in objects aren't modified unless you explicitly call `sffjs.unsafe()`.
 console.log(typeof String.format);
 // undefined
 sffjs.unsafe();
-console.log(String.format);
+console.log(typeof String.format);
 // function
 ```
 
@@ -118,4 +95,4 @@ string by the `__Format` function or the Javascript runtime using the `toString`
 
 These are additions in this implementation, and thus not supported by the .NET implementation:
 
-* Object paths/named parameters
+* Object paths/named parameters (`String.format('Hello, {user.name}', { user: { name: 'John' } })`).

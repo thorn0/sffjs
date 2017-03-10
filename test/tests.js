@@ -2,7 +2,7 @@
  * Unit tests for
  * String.format for JavaScript
  *
- * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+ * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
  *
  * Fork by Georgii Dolzhykov
@@ -287,6 +287,7 @@
         assert.formatsTo("1242.5", "{0:g}", 1242.5);
         assert.formatsTo("1242.5", "{0:G}", 1242.5);
         assert.formatsTo("0.0004", "{0:G}", 0.0004);
+        assert.formatsTo("0", "{0:G}", 0);
         assert.formatsTo("4E-05", "{0:G}", 0.00004);
         assert.formatsTo("4E-06", "{0:G}", 0.000004);
         assert.formatsTo("4.7e-07", "{0:g}", 0.00000047);

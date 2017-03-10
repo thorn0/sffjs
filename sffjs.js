@@ -1,7 +1,7 @@
 /**
- * String.format for JavaScript, version 1.11.3
+ * String.format for JavaScript, version 1.12.0
  *
- * Copyright (c) 2009-2014 Daniel Mester Pirttijärvi
+ * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
  *
  * Fork by Georgii Dolzhykov
@@ -624,7 +624,7 @@
                         exponent++;
                     }
 
-                    while (coefficient < 1) {
+                    while (coefficient > 0 && coefficient < 1) {
                         coefficient *= 10;
                         exponent--;
                     }
@@ -839,7 +839,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.11.3";
+    sffjs.version = "1.12.0";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>
