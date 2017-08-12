@@ -3,18 +3,20 @@
 [![Build Status](https://travis-ci.org/thorn0/sffjs.svg?branch=master)](https://travis-ci.org/thorn0/sffjs)
 [![npm](https://img.shields.io/npm/v/sffjs.svg)](https://www.npmjs.com/package/sffjs)
 
-Copyright (c) 2009-2016 Daniel Mester Pirttijärvi
-http://mstr.se/sffjs
+Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
 
 Fork by Georgii Dolzhykov
-http://github.com/thorn0/sffjs
 
 ## Description
 
-This is a fork of a [JavaScript library](https://github.com/dmester/sffjs) for string, date and number formatting. Formatting
-is done with format strings and is almost completely compatible with the String.Format method in Microsoft .NET Framework.
+This is a JavaScript library for string, date and number formatting.
+Formatting is done with format strings and is almost completely compatible with the String.Format method in Microsoft .NET Framework.
 
 The goal of this fork is to add support for Node.js and to explore compatibility with .NET.
+
+Links to the original library: [home page with usage examples](http://mstr.se/sffjs), [repo](https://github.com/dmester/sffjs).
+
+[Reference information regarding .NET format strings](http://msdn.microsoft.com/en-us/library/system.string.format.aspx)
 
 ## In the browser
 
@@ -72,11 +74,6 @@ sffjs.setCulture("tr");
 console.log(sffjs("{0:N} -- {1:M}", 1234.567, new Date(1985, 3, 7, 12, 33)));
 // 1.234,57 -- 07 Nisan
 ```
-
-## See more
-
-* [Usage examples](http://mstr.se/sffjs)
-* [Reference information regarding .NET format strings](http://msdn.microsoft.com/en-us/library/system.string.format.aspx)
 
 ## Compatibility with .NET
 
