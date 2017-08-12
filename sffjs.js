@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript, version 1.12.0
+ * String.format for JavaScript, version 1.13.0
  *
  * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
@@ -764,8 +764,8 @@
                     // Hour
                     match === "HH" ? numberPair(hour) :
                     match === "H" ? hour :
-                    match === "hh" ? numberPair((hour - 1) % 12 + 1) :
-                    match === "h" ? (hour - 1) % 12 + 1 :
+                    match === "hh" ? numberPair(hour % 12 || 12) :
+                    match === "h" ? hour % 12 || 12 :
 
                     // Minute
                     match === "mm" ? numberPair(minute) :
@@ -839,7 +839,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.12.0";
+    sffjs.version = "1.13.0";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>
