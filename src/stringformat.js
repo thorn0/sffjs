@@ -731,8 +731,7 @@
             dayOfWeek = date.getDay(),
             hour = date.getHours(),
             minute = date.getMinutes(),
-            second = date.getSeconds(),
-            ms = date.getMilliseconds();
+            second = date.getSeconds();
 
         // If no format is specified, default to G format
         format = format || "G";
@@ -745,8 +744,24 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|f{1,3}|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|tt?)/g,
             function(match) {
+
+                var matchLastChar = match.charAt(match.length - 1);
+
+                // Millisecond
+                if (matchLastChar === 'f' || matchLastChar == 'F') {
+                    var dot = match.charAt(0) === '.';
+                    var ms = date.getMilliseconds();
+                    var msStr = (numberTriple(ms) + '0000').slice(0, match.length - (dot ? 1 : 0));
+                    if (matchLastChar === 'F') {
+                        msStr = msStr.replace(/0+$/, '');
+                    }
+                    if (dot && msStr) {
+                        msStr = '.' + msStr;
+                    }
+                    return msStr;
+                }
 
                 // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
@@ -779,11 +794,6 @@
                     // Second
                     match === "ss" ? numberPair(second) :
                     match === "s" ? second :
-
-                    // Millisecond
-                    match === "fff" ? numberTriple(ms) :
-                    match === "ff" ? numberPair(Math.floor(ms / 10)) :
-                    match === "f" ? Math.floor(ms / 100) :
 
                     // AM/PM
                     match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
