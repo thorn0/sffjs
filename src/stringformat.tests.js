@@ -182,6 +182,16 @@
         assert.formatsTo("2009", "{0:yyyy}", dt2009);
         assert.formatsTo("09", "{0:yy}", dt2009);
 
+        test.section("Milliseconds");
+        var dtms1 = new Date(1989, 3, 2, 18, 20, 33, 1);
+        assert.formatsTo("04/02/1989 06:20:33.001 PM", "{0:MM/dd/yyyy hh:mm:ss.fff tt}", dtms1);
+        assert.formatsTo("04/02/1989 06:20:33.00 PM", "{0:MM/dd/yyyy hh:mm:ss.ff tt}", dtms1);
+        assert.formatsTo("04/02/1989 06:20:33.0 PM", "{0:MM/dd/yyyy hh:mm:ss.f tt}", dtms1);
+        var dtms9 = new Date(1989, 3, 2, 18, 20, 33, 9);
+        assert.formatsTo("04/02/1989 06:20:33.009 PM", "{0:MM/dd/yyyy hh:mm:ss.fff tt}", dtms9);
+        assert.formatsTo("04/02/1989 06:20:33.00 PM", "{0:MM/dd/yyyy hh:mm:ss.ff tt}", dtms9);
+        assert.formatsTo("04/02/1989 06:20:33.0 PM", "{0:MM/dd/yyyy hh:mm:ss.f tt}", dtms9);
+
         test.section("Special numeric values");
         assert.formatsTo("NaN", "{0}", NaN);
         assert.formatsTo("Infinity", "{0}", 1.7976931348623157E+10308);

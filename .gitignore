@@ -3,3 +3,4 @@ node_modules/
 tmp/
 /build
 *.exe
+/package-lock.json

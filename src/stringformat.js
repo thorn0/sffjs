@@ -91,6 +91,10 @@
         return n < 10 ? "0" + n : n;
     }
 
+    function numberTriple(n) {
+        return n < 10 ? "00" + n : n < 100 ? "0" + n : n;
+    }
+
     function hasValue(value) {
         /// <summary>Returns true if <paramref name="value"/> is not null or undefined.</summary>
         return value != null;
@@ -727,7 +731,8 @@
             dayOfWeek = date.getDay(),
             hour = date.getHours(),
             minute = date.getMinutes(),
-            second = date.getSeconds();
+            second = date.getSeconds(),
+            ms = date.getMilliseconds();
 
         // If no format is specified, default to G format
         format = format || "G";
@@ -740,7 +745,7 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|f{1,3}|tt?)/g,
             function(match) {
 
                 // Day
@@ -774,6 +779,11 @@
                     // Second
                     match === "ss" ? numberPair(second) :
                     match === "s" ? second :
+
+                    // Millisecond
+                    match === "fff" ? numberTriple(ms) :
+                    match === "ff" ? numberPair(Math.floor(ms / 10)) :
+                    match === "f" ? Math.floor(ms / 100) :
 
                     // AM/PM
                     match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
