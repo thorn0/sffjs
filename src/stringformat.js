@@ -744,7 +744,7 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
 
                 var matchLastChar = match.charAt(match.length - 1);
@@ -761,6 +761,22 @@
                         msStr = '.' + msStr;
                     }
                     return msStr;
+                }
+
+                // Offset from UTC
+                if (matchLastChar === 'z') {
+                    // z: Hours offset from UTC, with no leading zeros.
+                    // zz: Hours offset from UTC, with a leading zero for a single-digit value.
+                    // zzz: Hours and minutes offset from UTC.
+                    var offset = -date.getTimezoneOffset();
+                    var sign = offset >= 0 ? '+' : '-';
+                    var absOffsetMinutes = Math.abs(offset);
+                    var absOffsetHours = Math.floor(absOffsetMinutes / 60);
+                    var offsetStr = sign + (match === 'z' ? absOffsetHours : numberPair(absOffsetHours));
+                    if (match === 'zzz') {
+                        offsetStr += ':' + numberPair(absOffsetMinutes - absOffsetHours * 60);
+                    }
+                    return offsetStr;
                 }
 
                 // Day

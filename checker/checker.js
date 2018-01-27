@@ -72,7 +72,8 @@ function jsonReplacer(key, value) {
         return {
             __type: 'special',
             kind: 'datetime',
-            value: value.valueOf()
+            value: value.valueOf(),
+            offset: -value.getTimezoneOffset()
         };
     }
     return value;

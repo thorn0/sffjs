@@ -32,16 +32,22 @@
 (function() {
     "use strict";
     var browser = typeof window !== 'undefined',
-        dotNetStringFormat;
+        timezonedDate, dotNetStringFormat;
 
-    if (!browser) {
+    if (browser) {
+        timezonedDate = window.timezonedDate;
+    } else {
         global.sffjs = require('./stringformat');
         sffjs.unsafe();
 
         if (process.platform === 'win32' && process.argv[2] === 'dotnet') {
             dotNetStringFormat = require('../checker/checker');
         }
+
+        timezonedDate = require('timezoned-date');
     }
+
+    var Date = timezonedDate.makeConstructor(180); // UTC+03:00
 
     /// <summary>
     ///     Performs a series of unit tests and writes the output to the page.
@@ -220,6 +226,19 @@
         assert.formatsTo("04/02/1989 06:20:33.00900 PM", "{0:MM/dd/yyyy hh:mm:ss.fffff tt}", dtms9);
         assert.formatsTo("04/02/1989 06:20:33.009000 PM", "{0:MM/dd/yyyy hh:mm:ss.ffffff tt}", dtms9);
         assert.formatsTo("04/02/1989 06:20:33.0090000 PM", "{0:MM/dd/yyyy hh:mm:ss.fffffff tt}", dtms9);
+
+        test.section("Offset from UTC");
+        assert.formatsTo("04/02/1989 06:20:33.000+3 PM", "{0:MM/dd/yyyy hh:mm:ss.fffz tt}", dtpm);
+        assert.formatsTo("04/02/1989 06:20:33.000+03 PM", "{0:MM/dd/yyyy hh:mm:ss.fffzz tt}", dtpm);
+        assert.formatsTo("04/02/1989 06:20:33.000+03:00 PM", "{0:MM/dd/yyyy hh:mm:ss.fffzzz tt}", dtpm);
+        var dtutc = new (timezonedDate.makeConstructor(0))(2007, 6, 5, 4, 3, 2, 1);
+        assert.formatsTo("07/05/2007 04:03:02.001+0 AM", "{0:MM/dd/yyyy hh:mm:ss.fffz tt}", dtutc);
+        assert.formatsTo("07/05/2007 04:03:02.001+00 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzz tt}", dtutc);
+        assert.formatsTo("07/05/2007 04:03:02.001+00:00 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzzz tt}", dtutc);
+        var dtminus = new (timezonedDate.makeConstructor(-150))(2007, 6, 5, 4, 3, 2, 1);
+        assert.formatsTo("07/05/2007 04:03:02.001-2 AM", "{0:MM/dd/yyyy hh:mm:ss.fffz tt}", dtminus);
+        assert.formatsTo("07/05/2007 04:03:02.001-02 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzz tt}", dtminus);
+        assert.formatsTo("07/05/2007 04:03:02.001-02:30 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzzz tt}", dtminus);
 
         test.section("Special numeric values");
         assert.formatsTo("NaN", "{0}", NaN);

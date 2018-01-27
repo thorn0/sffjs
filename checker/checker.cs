@@ -29,7 +29,7 @@ public class Checker
             var serializer = new JavaScriptSerializer(new SpecialValueTypeResolver());
             serializer.RegisterConverters(new[] { new SpecialValueConverter() });
             arg = serializer.Deserialize<Arg>(args[0]);
-        } catch (Exception e){
+        } catch {
             return new Result { Error = "Invalid JSON: " + args[0] };
         }
         try {
@@ -61,13 +61,23 @@ class SerializedSpecialValue {}
 
 class SpecialValueConverter : JavaScriptConverter
 {
+    readonly DateTimeOffset epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     public override object Deserialize(IDictionary<string, object> dict, Type type, JavaScriptSerializer serializer) {
         var kind = Convert.ToString(dict["kind"]);
         if (kind == "number") {
             return Convert.ToDouble(dict["value"], CultureInfo.InvariantCulture);
         }
         if (kind == "datetime") {
-            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(Convert.ToInt64(dict["value"])).ToLocalTime();
+            int offsetHours = 0, offsetMinutes = 0;
+            if (dict.ContainsKey("offset")) {
+                var offset = Convert.ToInt32(dict["offset"]);
+                offsetHours = offset / 60;
+                offsetMinutes = offset - offsetHours * 60;
+            }
+            var value = Convert.ToInt64(dict["value"]);
+            var offsetTimeSpan = new TimeSpan(offsetHours, offsetMinutes, 0);
+            return epoch.AddMilliseconds(value).ToOffset(offsetTimeSpan);
         }
         return null;
     }
