@@ -741,6 +741,9 @@
             format = currentCulture[format] || format;
         }
 
+        // Using single custom format specifiers
+        format = format.replace(/%([a-z])/i, '$1');
+
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 

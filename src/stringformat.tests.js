@@ -240,6 +240,11 @@
         assert.formatsTo("07/05/2007 04:03:02.001-02 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzz tt}", dtminus);
         assert.formatsTo("07/05/2007 04:03:02.001-02:30 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzzz tt}", dtminus);
 
+        test.section("Single custom format specifiers");
+        assert.formatsTo("6", "{0:%h}", dtpm);
+        assert.formatsTo(" 6", "{0: h}", dtpm);
+        assert.formatsTo("6 ", "{0:h }", dtpm);
+
         test.section("Special numeric values");
         assert.formatsTo("NaN", "{0}", NaN);
         assert.formatsTo("Infinity", "{0}", 1.7976931348623157E+10308);
