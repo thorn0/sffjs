@@ -21,6 +21,7 @@
     "url": "https://github.com/thorn0/sffjs/issues"
   },
   "homepage": "https://github.com/thorn0/sffjs",
+  "private": true,
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-build-control": "^0.7.1",

@@ -10,7 +10,8 @@ module.exports = function(grunt) {
                 dir: 'build',
                 commit: true,
                 push: true,
-                message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%',
+                message:
+                    'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%',
                 tag: pkg.version
             },
             build: {
@@ -35,11 +36,35 @@ module.exports = function(grunt) {
                     }
                 }
             },
+            pkgjson: {
+                files: [
+                    {
+                        src: 'package.json',
+                        dest: 'build/'
+                    }
+                ],
+                options: {
+                    process: function(content) {
+                        var obj = JSON.parse(content);
+                        delete obj.private;
+                        delete obj.devDependencies;
+                        delete obj.scripts;
+                        return JSON.stringify(obj);
+                    }
+                }
+            },
             extras: {
-                files: [{
-                    src: ['bower.json', 'package.json', 'readme.md', 'LICENSE', 'changelog.txt'],
-                    dest: 'build/',
-                }],
+                files: [
+                    {
+                        src: [
+                            'bower.json',
+                            'readme.md',
+                            'LICENSE',
+                            'changelog.txt'
+                        ],
+                        dest: 'build/'
+                    }
+                ],
                 options: {
                     process: function(content) {
                         return content.replace(/\r/g, '');
@@ -52,15 +77,18 @@ module.exports = function(grunt) {
         },
         uglify: {
             build: {
-                files: [{
-                    dest: 'build/sffjs.min.js',
-                    src: 'build/sffjs.js'
-                }, {
-                    expand: true,
-                    cwd: 'src',
-                    src: 'cultures/*.js',
-                    dest: 'build/'
-                }]
+                files: [
+                    {
+                        dest: 'build/sffjs.min.js',
+                        src: 'build/sffjs.js'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'src',
+                        src: 'cultures/*.js',
+                        dest: 'build/'
+                    }
+                ]
             }
         }
     });
