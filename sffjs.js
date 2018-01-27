@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript, version 1.13.0
+ * String.format for JavaScript, version 1.13.2
  *
  * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
  * http://mstr.se/sffjs
@@ -89,6 +89,10 @@
     function numberPair(n) {
         /// <summary>Converts a number to a string that is at least 2 digit in length. A leading zero is inserted as padding if necessary.</summary>
         return n < 10 ? "0" + n : n;
+    }
+
+    function numberTriple(n) {
+        return n < 10 ? "00" + n : n < 100 ? "0" + n : n;
     }
 
     function hasValue(value) {
@@ -737,11 +741,46 @@
             format = currentCulture[format] || format;
         }
 
+        // Using single custom format specifiers
+        format = format.replace(/%([a-z])/i, '$1');
+
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
+
+                var matchLastChar = match.charAt(match.length - 1);
+
+                // Millisecond
+                if (matchLastChar === 'f' || matchLastChar == 'F') {
+                    var dot = match.charAt(0) === '.';
+                    var ms = date.getMilliseconds();
+                    var msStr = (numberTriple(ms) + '0000').slice(0, match.length - (dot ? 1 : 0));
+                    if (matchLastChar === 'F') {
+                        msStr = msStr.replace(/0+$/, '');
+                    }
+                    if (dot && msStr) {
+                        msStr = '.' + msStr;
+                    }
+                    return msStr;
+                }
+
+                // Offset from UTC
+                if (matchLastChar === 'z') {
+                    // z: Hours offset from UTC, with no leading zeros.
+                    // zz: Hours offset from UTC, with a leading zero for a single-digit value.
+                    // zzz: Hours and minutes offset from UTC.
+                    var offset = -date.getTimezoneOffset();
+                    var sign = offset >= 0 ? '+' : '-';
+                    var absOffsetMinutes = Math.abs(offset);
+                    var absOffsetHours = Math.floor(absOffsetMinutes / 60);
+                    var offsetStr = sign + (match === 'z' ? absOffsetHours : numberPair(absOffsetHours));
+                    if (match === 'zzz') {
+                        offsetStr += ':' + numberPair(absOffsetMinutes - absOffsetHours * 60);
+                    }
+                    return offsetStr;
+                }
 
                 // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
@@ -839,7 +878,7 @@
     };
 
     /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.13.0";
+    sffjs.version = "1.13.2";
 
     sffjs.setCulture = function(languageCode) {
         /// <summary>
