@@ -17,7 +17,7 @@
         _am: "vorm.",
         _pm: "nachm.",
         _t: "'",
-        _c: "#,0.00 ''",
+        _c: "#,0.00 'CHF'",
         _d: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
         _D: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
         _m: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
