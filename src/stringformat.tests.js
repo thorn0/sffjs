@@ -336,7 +336,14 @@
         assert.formatsTo("1242.000000000000000000000000000000", "{0:F30}", 1242);
         assert.formatsTo("F301", "{0:F300}", 1);
         assert.formatsTo("1242", "{0:F0}", 1242.3);
+        assert.formatsTo("0.000000002", "{0:f9}", 0.000000001594874941);
 
+        // sffjs rounds traditionally away from zero, instead of to the nearest even number
+        assert.formatsTo("1.00", "{0:f2}", 1.0049);
+        assert.formatsTo("1.01", "{0:f2}", 1.005);
+        assert.formatsTo("-1.00", "{0:f2}", -1.0049);
+        assert.formatsTo("-1.01", "{0:f2}", -1.005);
+        
         test.section("Specifier N");
         assert.formatsTo("1,242.50", "{0:n}", 1242.5);
         assert.formatsTo("1,242.50", "{0:N}", 1242.5);
@@ -346,6 +353,8 @@
         assert.formatsTo("1,242.000000000000000000000000000000", "{0:N30}", 1242);
         assert.formatsTo("N301", "{0:N300}", 1);
         assert.formatsTo("1,242", "{0:N0}", 1242.3);
+        assert.formatsTo("1,242,300,000,000,000,000,000", "{0:N0}", 1242300000000000000000.0);
+        assert.formatsTo("1,242,300,000,000,000,000,000.0", "{0:N1}", 1242300000000000000000.0);
 
         test.section("Specifier G");
         assert.formatsTo("1242", "{0:g}", 1242);

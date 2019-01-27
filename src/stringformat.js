@@ -184,13 +184,52 @@
 
     // Maths
 
+    function ensureFixedPoint(numberString) {
+        var parts = numberString.split("e");
+        var result = parts[0];
+
+        if (parts.length > 1) {
+            // Convert exponential to fixed-point number
+            var exponent = Number(parts[1]);
+            result = result.replace(".", "");
+
+            if (exponent < 0) {
+                while (++exponent < 0) {
+                    result = "0" + result;
+                }
+                result = "0." + result;
+            }
+            else {
+                while (exponent >= result.length) {
+                    result += "0";
+                }
+            }
+        }
+
+        return result;
+    }
+
     function numberToString(number, decimals) {
         /// <summary>Generates a string representation of the specified number with the specified number of digits.</summary>
         /// <param name="number" type="Number">The value to be processed.</param>
         /// <param name="decimals" type="Number" integer="true">The maximum number of decimals. If not specified, the value is not rounded.</param>
         /// <returns>The rounded absolute value as a string.</returns>
-        var roundingFactor = Math.pow(10, decimals || 0);
-        return "" + (Math.round(Math.abs(number) * roundingFactor) / roundingFactor);
+
+        var result = ensureFixedPoint(Math.abs(number).toString());
+
+        var radixIndex = result.indexOf(".");
+        if (radixIndex > 0 && result.length - radixIndex - 1 > decimals) {
+            // Rounding required
+
+            // Add 1 to string representation of the number to improve
+            // the chance that toFixed rounds correctly.
+            result = ensureFixedPoint(Number(result + "1").toFixed(decimals));
+
+            // Trim excessive decimal zeroes
+            result = result.replace(/\.?0+$/, "");
+        }
+
+        return result;
     }
 
     function numberOfIntegralDigits(numberString) {
@@ -641,10 +680,10 @@
 
                         // When (exponent <= -5) the exponential notation is always more compact.
                         //   e.g. 0.0000123 vs 1.23E-05
-                        // When (exponent >= precision) the number cannot be represented 
-                        //   with the right number of significant digits without using 
+                        // When (exponent >= precision) the number cannot be represented
+                        //   with the right number of significant digits without using
                         //   exponential notation.
-                        //   e.g. 123 (1.23E+02) cannot be represented using fixed-point 
+                        //   e.g. 123 (1.23E+02) cannot be represented using fixed-point
                         //   notation with less than 3 significant digits.
                         if (exponent > -5 && exponent < precision) {
                             // Use fixed-point notation
@@ -675,8 +714,8 @@
                     }
 
                     return (
-                        basicNumberFormatter(coefficient, 1, minDecimals, maxDecimals, radixPoint, thousandSeparator) + 
-                        exponentPrefix + 
+                        basicNumberFormatter(coefficient, 1, minDecimals, maxDecimals, radixPoint, thousandSeparator) +
+                        exponentPrefix +
                         basicNumberFormatter(exponent, exponentPrecision, 0, 0)
                         );
 
