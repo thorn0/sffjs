@@ -827,7 +827,7 @@
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|y+|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
                 var char0 = match[0];
 
@@ -876,8 +876,9 @@
                     char0 === "M"    ? zeroPad(month + 1, match.length) :
 
                     // Year
-                    match === "yyyy" ? zeroPad(year, 4) :
                     match === "yy"   ? zeroPad(year % 100, 2) :
+                    match === "y"    ? year % 100 :
+                    char0 === "y"    ? zeroPad(year, match.length) :
 
                     // Hour
                     char0 === "H"    ? zeroPad(hour, match.length) :
