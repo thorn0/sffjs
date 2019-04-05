@@ -87,20 +87,8 @@
     // General helpers
 
     /**
-     * Converts a number to a string that is at least 2 digit in length. A leading zero is inserted as padding if necessary.
-     * @param {number} n
-     */
-    function numberPair(n) {
-        return n < 10 ? "0" + n : n;
-    }
-
-    function numberTriple(n) {
-        return n < 10 ? "00" + n : n < 100 ? "0" + n : n;
-    }
-
-    /**
      * Pads the specified value with zeroes to the left until it reaches the specified length.
-     * @param {*} value Value to zeropad. 
+     * @param {*} value Value to zeropad.
      * @param {number} len Minimum length of result.
      * @returns {string}
      */
@@ -841,6 +829,7 @@
 
         return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
+                var char0 = match[0];
 
                 var matchLastChar = match[match.length - 1];
 
@@ -848,7 +837,7 @@
                 if (matchLastChar === 'f' || matchLastChar == 'F') {
                     var dot = match[0] === '.';
                     var ms = date.getMilliseconds();
-                    var msStr = (numberTriple(ms) + '0000').slice(0, match.length - (dot ? 1 : 0));
+                    var msStr = (zeroPad(ms, 3) + '0000').slice(0, match.length - (dot ? 1 : 0));
                     if (matchLastChar === 'F') {
                         msStr = msStr.replace(/0+$/, '');
                     }
@@ -867,9 +856,9 @@
                     var sign = offset >= 0 ? '+' : '-';
                     var absOffsetMinutes = Math.abs(offset);
                     var absOffsetHours = Math.floor(absOffsetMinutes / 60);
-                    var offsetStr = sign + (match === 'z' ? absOffsetHours : numberPair(absOffsetHours));
+                    var offsetStr = sign + (match === 'z' ? absOffsetHours : zeroPad(absOffsetHours, 2));
                     if (match === 'zzz') {
-                        offsetStr += ':' + numberPair(absOffsetMinutes - absOffsetHours * 60);
+                        offsetStr += ':' + zeroPad(absOffsetMinutes - absOffsetHours * 60, 2);
                     }
                     return offsetStr;
                 }
@@ -877,38 +866,32 @@
                 // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
                     // Use three first characters from long day name if abbreviations are not specifed
-                    match === "ddd" ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
-                    match === "dd" ? numberPair(dayOfMonth) :
-                    match === "d" ? dayOfMonth :
+                    match === "ddd"  ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
+                    char0 === "d"    ? zeroPad(dayOfMonth, match.length) :
 
                     // Month
                     match === "MMMM" ? monthNames[month] :
                     // Use three first characters from long month name if abbreviations are not specifed
-                    match === "MMM" ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
-                    match === "MM" ? numberPair(month + 1) :
-                    match === "M" ? month + 1 :
+                    match === "MMM"  ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
+                    char0 === "M"    ? zeroPad(month + 1, match.length) :
 
                     // Year
                     match === "yyyy" ? zeroPad(year, 4) :
-                    match === "yy" ? zeroPad(year % 100, 2) :
+                    match === "yy"   ? zeroPad(year % 100, 2) :
 
                     // Hour
-                    match === "HH" ? numberPair(hour) :
-                    match === "H" ? hour :
-                    match === "hh" ? numberPair(hour % 12 || 12) :
-                    match === "h" ? hour % 12 || 12 :
+                    char0 === "H"    ? zeroPad(hour, match.length) :
+                    char0 === "h"    ? zeroPad(hour % 12 || 12, match.length) :
 
                     // Minute
-                    match === "mm" ? numberPair(minute) :
-                    match === "m" ? minute :
+                    char0 === "m"    ? zeroPad(minute, match.length) :
 
                     // Second
-                    match === "ss" ? numberPair(second) :
-                    match === "s" ? second :
+                    char0 === "s"    ? zeroPad(second, match.length) :
 
                     // AM/PM
-                    match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
-                    match === "t" ? (hour < 12 ? currentCulture._am : currentCulture._pm)[0] :
+                    match === "tt"   ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
+                    char0 === "t"    ? (hour < 12 ? currentCulture._am : currentCulture._pm)[0] :
 
                     // String literal => strip quotation marks
                     match.substr(1, match.length - 1 - (match[0] != "\\"));
