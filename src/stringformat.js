@@ -303,7 +303,7 @@
     function groupedAppend(out, value) {
         for (var i = 0, length = value.length; i < length; i++) {
             // Write number
-            out.push(value.charAt(i));
+            out.push(value[i]);
 
             // Begin a new group?
             if (out.g > 1 && out.g-- % 3 === 1) {
@@ -453,7 +453,7 @@
         // Constants are represented with String instances, while all other tokens are represented with
         // string literals.
         for (formatIndex = 0; formatIndex < format.length; formatIndex++) {
-            currentToken = format.charAt(formatIndex);
+            currentToken = format[formatIndex];
 
             // Check if we have reached a literal
             if (currentToken === "'" || currentToken === '"') {
@@ -477,7 +477,7 @@
                 // Check for single escaped character
             } else if (currentToken === "\\") {
                 // String instances are used to represent constants
-                tokens.push(new String(format.charAt(++formatIndex)));
+                tokens.push(new String(format[++formatIndex]));
 
             } else if (currentToken === ";") {
 
@@ -578,7 +578,7 @@
                         if (unused) {
                             groupedAppend(out, number.substr(0, numberIndex));
                         }
-                        groupedAppend(out, number.charAt(numberIndex));
+                        groupedAppend(out, number[numberIndex]);
 
                         // Not yet inside the number number, force a zero?
                     } else if (numberIndex >= integralDigits - forcedDigits) {
@@ -589,7 +589,7 @@
 
                 } else if (forcedDecimals-- > 0 || numberIndex < number.length) {
                     // In the fractional part
-                    groupedAppend(out, numberIndex >= number.length ? "0" : number.charAt(numberIndex));
+                    groupedAppend(out, numberIndex >= number.length ? "0" : number[numberIndex]);
                 }
 
                 numberIndex++;
@@ -830,11 +830,11 @@
         return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
 
-                var matchLastChar = match.charAt(match.length - 1);
+                var matchLastChar = match[match.length - 1];
 
                 // Millisecond
                 if (matchLastChar === 'f' || matchLastChar == 'F') {
-                    var dot = match.charAt(0) === '.';
+                    var dot = match[0] === '.';
                     var ms = date.getMilliseconds();
                     var msStr = (numberTriple(ms) + '0000').slice(0, match.length - (dot ? 1 : 0));
                     if (matchLastChar === 'F') {
@@ -896,10 +896,10 @@
 
                     // AM/PM
                     match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
-                    match === "t" ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
+                    match === "t" ? (hour < 12 ? currentCulture._am : currentCulture._pm)[0] :
 
                     // String literal => strip quotation marks
-                    match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
+                    match.substr(1, match.length - 1 - (match[0] != "\\"));
             }
         );
     }
