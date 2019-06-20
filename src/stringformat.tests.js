@@ -244,6 +244,7 @@
         assert.formatsTo("6", "{0:%h}", dtpm);
         assert.formatsTo(" 6", "{0: h}", dtpm);
         assert.formatsTo("6 ", "{0:h }", dtpm);
+        assert.formatsTo("66", "{0:%hh}", dtpm);
 
         test.section("Special numeric values");
         assert.formatsTo("NaN", "{0}", NaN);
