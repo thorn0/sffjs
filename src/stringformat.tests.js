@@ -2,8 +2,8 @@
  * Unit tests for
  * String.format for JavaScript
  *
- * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
- * http://mstr.se/sffjs
+ * Copyright (c) 2009-2019 Daniel Mester Pirttijärvi
+ * https://github.com/dmester/sffjs
  *
  * Fork by Georgii Dolzhykov
  * http://github.com/thorn0/sffjs
