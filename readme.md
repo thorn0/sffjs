@@ -86,6 +86,7 @@ implementation. In this section differences will be listed
 
 * Number format
     * Number format specifier `c` ignores specified precision
+    * Number format specifier `G` formats the number according to how a double is formatted in .NET. Other numeric data type are formatted differently in .NET.
 
 Other types don't have a format implementation, and are thus serialized to a
 string by the `__Format` function or the Javascript runtime using the `toString` function.

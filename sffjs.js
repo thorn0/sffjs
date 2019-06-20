@@ -1,8 +1,8 @@
 /**
- * String.format for JavaScript, version 1.13.2
+ * String.format for JavaScript, version 1.16.0
  *
- * Copyright (c) 2009-2017 Daniel Mester Pirttijärvi
- * http://mstr.se/sffjs
+ * Copyright (c) 2009-2019 Daniel Mester Pirttijärvi
+ * https://github.com/dmester/sffjs
  *
  * Fork by Georgii Dolzhykov
  * http://github.com/thorn0/sffjs
@@ -32,7 +32,7 @@
 
     if (typeof module !== 'undefined' && module.exports) {
         // CommonJS
-        module.exports = factory();
+        module.exports = factory(true);
     } else if (typeof define === "function" && define.amd) {
         // AMD
         define(factory);
@@ -42,7 +42,7 @@
         global.sffjs.unsafe();
     }
 
-})(this, function() {
+})(this, function(isCommonJsEnv) {
     "use strict";
 
     // ***** Private Variables *****
@@ -86,22 +86,30 @@
 
     // General helpers
 
-    function numberPair(n) {
-        /// <summary>Converts a number to a string that is at least 2 digit in length. A leading zero is inserted as padding if necessary.</summary>
-        return n < 10 ? "0" + n : n;
+    /**
+     * Pads the specified value with zeroes to the left until it reaches the specified length.
+     * @param {*} value Value to zeropad.
+     * @param {number} len Minimum length of result.
+     * @returns {string}
+     */
+    function zeroPad(value, len) {
+        var s = "" + value;
+        while (s.length < len) s = "0" + s;
+        return s;
     }
 
-    function numberTriple(n) {
-        return n < 10 ? "00" + n : n < 100 ? "0" + n : n;
-    }
-
+    /**
+     * Returns `true` if `value` is not null or undefined.
+     * @param {*} value
+     */
     function hasValue(value) {
-        /// <summary>Returns true if <paramref name="value"/> is not null or undefined.</summary>
         return value != null;
     }
 
+    /**
+     * Returns the first of the two values that is not NaN.
+     */
     function numberCoalesce(value1, value2) {
-        /// <summary>Returns the first of the two values that is not NaN.</summary>
         return isNaN(value1) ? value2 : value1;
     }
 
@@ -111,9 +119,10 @@
 
     // Culture functions
 
+    /**
+     * This method will fill gaps in the specified culture with information from the invariant culture.
+     */
     function fillGapsInCulture(culture) {
-        /// <summary>This method will fill gaps in the specified culture with information from the invariant culture.</summary>
-
         if (culture._cr == null) {
             culture._cr = culture._r;
         }
@@ -155,7 +164,7 @@
     }
 
     var ensureCultureLoaded;
-    if (typeof module !== 'undefined' && module.exports) {
+    if (isCommonJsEnv) {
         ensureCultureLoaded = function(key) {
             if (!(key in cultures)) {
                 cultures[key] = false;
@@ -166,8 +175,10 @@
         };
     }
 
+    /**
+     * This method will update the currently selected culture object to reflect the currently set LCID (as far as possible).
+     */
     function updateCulture() {
-        /// <summary>This method will update the currently selected culture object to reflect the currently set LCID (as far as possible).</summary>
         var result;
         if (currentCultureId) {
             var ids = getCultureAndItsParents(currentCultureId);
@@ -184,37 +195,84 @@
 
     // Maths
 
-    function numberToString(number, decimals) {
-        /// <summary>Generates a string representation of the specified number with the specified number of digits.</summary>
-        /// <param name="number" type="Number">The value to be processed.</param>
-        /// <param name="decimals" type="Number" integer="true" optional="true">The maximum number of decimals. If not specified, the value is not rounded.</param>
-        /// <returns>The rounded absolute value as a string.</returns>
-        var roundingFactor = Math.pow(10, decimals || 0);
-        return "" + (Math.round(Math.abs(number) * roundingFactor) / roundingFactor);
+    function ensureFixedPoint(numberString) {
+        var parts = numberString.split("e");
+        var result = parts[0];
+
+        if (parts.length > 1) {
+            // Convert exponential to fixed-point number
+            var exponent = Number(parts[1]);
+            result = result.replace(".", "");
+
+            if (exponent < 0) {
+                while (++exponent < 0) {
+                    result = "0" + result;
+                }
+                result = "0." + result;
+            }
+            else {
+                while (exponent >= result.length) {
+                    result += "0";
+                }
+            }
+        }
+
+        return result;
     }
 
+    /**
+     * Generates a string representation of the specified number with the specified number of digits.
+     * @param {number} number The value to be processed.
+     * @param {number} [decimals] The maximum number of decimals. If not specified, the value is not rounded.
+     * @returns {string} The rounded absolute value as a string.
+     */
+    function numberToString(number, decimals) {
+        var result = ensureFixedPoint(Math.abs(number).toString());
+
+        var radixIndex = result.indexOf(".");
+        if (radixIndex > 0 && result.length - radixIndex - 1 > decimals) {
+            // Rounding required
+
+            // Add 1 to string representation of the number to improve
+            // the chance that toFixed rounds correctly.
+            result = ensureFixedPoint(Number(result + "1").toFixed(decimals));
+
+            // Trim excessive decimal zeroes
+            result = result.replace(/\.?0+$/, "");
+        }
+
+        return result;
+    }
+
+    /**
+     * Counts the number of integral digits in a number converted to a string by the JavaScript runtime.
+     * @param {string} numberString
+     * @returns {number}
+     */
     function numberOfIntegralDigits(numberString) {
-        /// <summary>Counts the number of integral digits in a number converted to a string by the JavaScript runtime.</summary>
         var point = numberString.indexOf(".");
         return point < 0 ? numberString.length : point;
     }
 
+    /**
+     * Counts the number of decimal digits in a number converted to a string by the JavaScript runtime
+     * @param {string} numberString
+     * @returns {number}
+     */
     function numberOfDecimalDigits(numberString) {
-        /// <summary>Counts the number of decimal digits in a number converted to a string by the JavaScript runtime</summary>
         var point = numberString.indexOf(".");
         return point < 0 ? 0 : numberString.length - point - 1;
     }
 
     // Formatting helpers
 
+    /**
+     * This function resolves a path on the format `<membername>(.<membername>|[<index>])*`
+     * and evaluates the value.
+     * @param {string} path A series of path components separated by points. Each component is either an index in square brackets.
+     * @param {*} value An object on which the path is evaluated.
+     */
     function resolvePath(path, value) {
-        /// <summary>
-        ///     This function resolves a path on the format <membername>(.<membername>|[<index>])*
-        ///     and evaluates the value.
-        /// </summary>
-        /// <param name="path">A series of path components separated by points. Each component is either an index in square brackets.</param>
-        /// <param name="value">An object on which the path is evaluated.</param>
-
         // Parse and evaluate path
         if (hasValue(value)) {
             var followingMembers = /(\.([a-zA-Z_$]\w*)|\[(\d+)\])/g,
@@ -231,22 +289,21 @@
         return value;
     }
 
+    /**
+     * Writes a value to an array in groups of three digits.
+     * @param {string[]} out An array used as string builder to which the grouped output will be appended. The array
+     * may have to properties that affect the output:
+     *
+     * * `g`: the number of integral digits left to write.
+     * * `t`: the thousand separator.
+     *
+     * If any of those properties are missing, the output is not grouped.
+     * @param {string} value The value that will be written to `out`.
+     */
     function groupedAppend(out, value) {
-        /// <summary>Writes a value to an array in groups of three digits.</summary>
-        /// <param name="out" type="Array">
-        ///     An array used as string builder to which the grouped output will be appended. The array
-        ///     may have to properties that affect the output:
-        ///
-        ///         g: the number of integral digits left to write.
-        ///         t: the thousand separator.
-        ///
-        //      If any of those properties are missing, the output is not grouped.
-        /// </param>
-        /// <param name="value" type="String">The value that will be written to <paramref name="out"/>.</param>
-
         for (var i = 0, length = value.length; i < length; i++) {
             // Write number
-            out.push(value.charAt(i));
+            out.push(value[i]);
 
             // Begin a new group?
             if (out.g > 1 && out.g-- % 3 === 1) {
@@ -255,14 +312,15 @@
         }
     }
 
+    /**
+     * Process a single format item in a composite format string.
+     * @param {string} pathOrIndex The raw argument index or path component of the format item.
+     * @param {string} align The raw alignment component of the format item.
+     * @param {string} formatString The raw format string of the format item.
+     * @param {Array} args The arguments that were passed to String.format, where index 0 is the full composite format string.
+     * @returns {string} The formatted value as a string.
+     */
     function processFormatItem(pathOrIndex, align, formatString, args) {
-        /// <summary>Process a single format item in a composite format string</summary>
-        /// <param name="pathOrIndex" type="String">The raw argument index or path component of the format item.</param>
-        /// <param name="align" type="String">The raw alignment component of the format item.</param>
-        /// <param name="formatString" type="String">The raw format string of the format item.</param>
-        /// <param name="args" type="Array">The arguments that were passed to String.format, where index 0 is the full composite format string.</param>
-        /// <returns>The formatted value as a string.</returns>
-
         var value,
             index = parseInt(pathOrIndex, 10),
             paddingLength,
@@ -309,16 +367,19 @@
         return (align < 0 ? value + padding : padding + value);
     }
 
+    /**
+     * Handles basic formatting used for standard numeric format strings.
+     * @param {number} number The number to format.
+     * @param {number} minIntegralDigits The minimum number of integral digits. The number is padded with leading
+     * zeroes if necessary.
+     * @param {number} minDecimalDigits The minimum number of decimal digits. The decimal part is padded with trailing
+     * zeroes if necessary.
+     * @param {number} maxDecimalDigits The maximum number of decimal digits. The number is rounded if necessary.
+     * @param {string} radixPoint The string that will be appended to the output as a radix point.
+     * @param {string} thousandSeparator The string that will be used as a thousand separator of the integral digits.
+     * @returns {string} The formatted value as a string.
+     */
     function basicNumberFormatter(number, minIntegralDigits, minDecimalDigits, maxDecimalDigits, radixPoint, thousandSeparator) {
-        /// <summary>Handles basic formatting used for standard numeric format strings.</summary>
-        /// <param name="number" type="Number">The number to format.</param>
-        /// <param name="minIntegralDigits" type="Number" integer="true">The minimum number of integral digits. The number is padded with leading zeroes if necessary.</param>
-        /// <param name="minDecimals" type="Number" integer="true">The minimum number of decimal digits. The decimal part is padded with trailing zeroes if necessary.</param>
-        /// <param name="maxDecimals" type="Number" integer="true">The maximum number of decimal digits. The number is rounded if necessary.</param>
-        /// <param name="radixPoint" type="String">The string that will be appended to the output as a radix point.</param>
-        /// <param name="thousandSeparator" type="String">The string that will be used as a thousand separator of the integral digits.</param>
-        /// <returns>The formatted value as a string.</returns>
-
         var integralDigits, decimalDigits, out = [];
         out.t = thousandSeparator;
 
@@ -358,14 +419,15 @@
         return out.join("");
     }
 
+    /**
+     * Handles formatting of custom numeric format strings.
+     * @param {number} number The number to format.
+     * @param {string} format A string specifying the format of the output.
+     * @param {string} radixPoint The string that will be appended to the output as a radix point.
+     * @param {string} thousandSeparator The string that will be used as a thousand separator of the integral digits.
+     * @returns {string} The formatted value as a string.
+     */
     function customNumberFormatter(number, format, radixPoint, thousandSeparator) {
-        /// <summary>Handles formatting of custom numeric format strings.</summary>
-        /// <param name="number" type="Number">The number to format.</param>
-        /// <param name="format" type="String">A string specifying the format of the output.</param>
-        /// <param name="radixPoint" type="String">The string that will be appended to the output as a radix point.</param>
-        /// <param name="thousandSeparator" type="String">The string that will be used as a thousand separator of the integral digits.</param>
-        /// <returns>The formatted value as a string.</returns>
-
         var digits = 0,
             forcedDigits = -1,
             integralDigits = -1,
@@ -391,7 +453,7 @@
         // Constants are represented with String instances, while all other tokens are represented with
         // string literals.
         for (formatIndex = 0; formatIndex < format.length; formatIndex++) {
-            currentToken = format.charAt(formatIndex);
+            currentToken = format[formatIndex];
 
             // Check if we have reached a literal
             if (currentToken === "'" || currentToken === '"') {
@@ -415,7 +477,7 @@
                 // Check for single escaped character
             } else if (currentToken === "\\") {
                 // String instances are used to represent constants
-                tokens.push(new String(format.charAt(++formatIndex)));
+                tokens.push(new String(format[++formatIndex]));
 
             } else if (currentToken === ";") {
 
@@ -516,7 +578,7 @@
                         if (unused) {
                             groupedAppend(out, number.substr(0, numberIndex));
                         }
-                        groupedAppend(out, number.charAt(numberIndex));
+                        groupedAppend(out, number[numberIndex]);
 
                         // Not yet inside the number number, force a zero?
                     } else if (numberIndex >= integralDigits - forcedDigits) {
@@ -527,7 +589,7 @@
 
                 } else if (forcedDecimals-- > 0 || numberIndex < number.length) {
                     // In the fractional part
-                    groupedAppend(out, numberIndex >= number.length ? "0" : number.charAt(numberIndex));
+                    groupedAppend(out, numberIndex >= number.length ? "0" : number[numberIndex]);
                 }
 
                 numberIndex++;
@@ -549,12 +611,13 @@
 
     // ***** FORMATTERS
     // ***** Number Formatting *****
-    function mainNumberFormatter(number, format) {
-        /// <summary>
-        ///     Formats this number according the specified format string.
-        /// </summary>
-        /// <param name="format">The formatting string used to format this number.</param>
 
+    /**
+     * Formats this number according the specified format string.
+     * @param {string} format The formatting string used to format this number.
+     * @returns {string}
+     */
+    function mainNumberFormatter(number, format) {
         var radixPoint = currentCulture._r,
             thousandSeparator = currentCulture._t;
 
@@ -567,20 +630,17 @@
 
         // Default formatting if no format string is specified
         if (!format && format !== "0") {
-            return basicNumberFormatter(number, 0, 0, 10, radixPoint);
+            format = "G";
         }
 
         // EVALUATE STANDARD NUMERIC FORMAT STRING
         // See reference at
         // http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx
 
-        var standardFormatStringMatch = format.match(/^([a-zA-Z])(\d*)$/);
+        var standardFormatStringMatch = format.match(/^([a-zA-Z])(\d{0,2})$/);
         if (standardFormatStringMatch) {
             var standardFormatStringMatch_UpperCase = standardFormatStringMatch[1].toUpperCase(),
                 precision = parseInt(standardFormatStringMatch[2], 10); // parseInt used to ensure empty string is aprsed to NaN
-
-            // Limit precision to max 15
-            precision = precision > 15 ? 15 : precision;
 
             // Standard numeric format string
             switch (standardFormatStringMatch_UpperCase) {
@@ -619,7 +679,7 @@
 
                     // Note that we might have fell through from G above!
 
-                    // Determine coefficient and exponent for normalized notation
+                    // Determine coefficient and exponent for exponential notation
                     var exponent = 0,
                         coefficient = Math.abs(number);
 
@@ -638,20 +698,30 @@
                         minDecimals, maxDecimals;
 
                     if (standardFormatStringMatch_UpperCase === "G") {
-                        if (exponent > -5 && (!precision || exponent < precision)) {
-                            minDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 0;
-                            maxDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 10;
+                        // Default precision in .NET is dependent on the data type.
+                        // For double the default precision is 15.
+                        precision = precision || 15;
 
-                            return basicNumberFormatter(number, 1, minDecimals, maxDecimals, radixPoint);
+                        // When (exponent <= -5) the exponential notation is always more compact.
+                        //   e.g. 0.0000123 vs 1.23E-05
+                        // When (exponent >= precision) the number cannot be represented
+                        //   with the right number of significant digits without using
+                        //   exponential notation.
+                        //   e.g. 123 (1.23E+02) cannot be represented using fixed-point
+                        //   notation with less than 3 significant digits.
+                        if (exponent > -5 && exponent < precision) {
+                            // Use fixed-point notation
+                            return basicNumberFormatter(number, 1, 0, precision - exponent - 1, radixPoint);
                         }
 
                         exponentPrefix = exponentPrefix === "G" ? "E" : "e";
                         exponentPrecision = 2;
 
-                        // The precision of G is number of significant digits, not the number of decimals.
-                        minDecimals = (precision || 1) - 1;
-                        maxDecimals = (precision || 11) - 1;
+                        // The precision of G is the number of significant digits
+                        minDecimals = 0;
+                        maxDecimals = precision - 1;
                     } else {
+                        // The precision of E is the number of decimal digits
                         minDecimals = maxDecimals = numberCoalesce(precision, 6);
                     }
 
@@ -667,7 +737,11 @@
                         coefficient *= -1;
                     }
 
-                    return basicNumberFormatter("" + coefficient, 1, minDecimals, maxDecimals, radixPoint, thousandSeparator) + exponentPrefix + basicNumberFormatter(exponent, exponentPrecision, 0);
+                    return (
+                        basicNumberFormatter(coefficient, 1, minDecimals, maxDecimals, radixPoint, thousandSeparator) +
+                        exponentPrefix +
+                        basicNumberFormatter(exponent, exponentPrecision, 0, 0)
+                        );
 
                 case "P":
                     // PERCENT
@@ -724,6 +798,12 @@
     }
 
     // ***** Date Formatting *****
+
+    /**
+     * Formats this date according the specified format string.
+     * @param {string} format The formatting string used to format this date.
+     * @returns {string}
+     */
     function mainDateFormatter(date, format) {
         var year = date.getFullYear(),
             month = date.getMonth(),
@@ -742,21 +822,22 @@
         }
 
         // Using single custom format specifiers
-        format = format.replace(/%([a-z])/i, '$1');
+        format = format.replace(/%([a-z])/i, '""$1""');
 
         // If the pattern contains 'd' or 'dd', genitive form is used for MMMM
         var monthNames = currentCulture._Mg && /(^|[^d])d(?!dd)/.test(format) ? currentCulture._Mg : currentCulture._M;
 
-        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
+        return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|y+|HH?|hh?|mm?|ss?|\.?[fF]{1,7}|z{1,3}|tt?)/g,
             function(match) {
+                var char0 = match[0];
 
-                var matchLastChar = match.charAt(match.length - 1);
+                var matchLastChar = match[match.length - 1];
 
                 // Millisecond
                 if (matchLastChar === 'f' || matchLastChar == 'F') {
-                    var dot = match.charAt(0) === '.';
+                    var dot = match[0] === '.';
                     var ms = date.getMilliseconds();
-                    var msStr = (numberTriple(ms) + '0000').slice(0, match.length - (dot ? 1 : 0));
+                    var msStr = (zeroPad(ms, 3) + '0000').slice(0, match.length - (dot ? 1 : 0));
                     if (matchLastChar === 'F') {
                         msStr = msStr.replace(/0+$/, '');
                     }
@@ -775,9 +856,9 @@
                     var sign = offset >= 0 ? '+' : '-';
                     var absOffsetMinutes = Math.abs(offset);
                     var absOffsetHours = Math.floor(absOffsetMinutes / 60);
-                    var offsetStr = sign + (match === 'z' ? absOffsetHours : numberPair(absOffsetHours));
+                    var offsetStr = sign + (match === 'z' ? absOffsetHours : zeroPad(absOffsetHours, 2));
                     if (match === 'zzz') {
-                        offsetStr += ':' + numberPair(absOffsetMinutes - absOffsetHours * 60);
+                        offsetStr += ':' + zeroPad(absOffsetMinutes - absOffsetHours * 60, 2);
                     }
                     return offsetStr;
                 }
@@ -785,54 +866,48 @@
                 // Day
                 return match === "dddd" ? currentCulture._D[dayOfWeek] :
                     // Use three first characters from long day name if abbreviations are not specifed
-                    match === "ddd" ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
-                    match === "dd" ? numberPair(dayOfMonth) :
-                    match === "d" ? dayOfMonth :
+                    match === "ddd"  ? (currentCulture._d ? currentCulture._d[dayOfWeek] : currentCulture._D[dayOfWeek].substr(0, 3)) :
+                    char0 === "d"    ? zeroPad(dayOfMonth, match.length) :
 
                     // Month
                     match === "MMMM" ? monthNames[month] :
                     // Use three first characters from long month name if abbreviations are not specifed
-                    match === "MMM" ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
-                    match === "MM" ? numberPair(month + 1) :
-                    match === "M" ? month + 1 :
+                    match === "MMM"  ? (currentCulture._m ? currentCulture._m[month] : currentCulture._M[month].substr(0, 3)) :
+                    char0 === "M"    ? zeroPad(month + 1, match.length) :
 
                     // Year
-                    match === "yyyy" ? year :
-                    match === "yy" ? ("" + year).substr(2) :
+                    match === "yy"   ? zeroPad(year % 100, 2) :
+                    match === "y"    ? year % 100 :
+                    char0 === "y"    ? zeroPad(year, match.length) :
 
                     // Hour
-                    match === "HH" ? numberPair(hour) :
-                    match === "H" ? hour :
-                    match === "hh" ? numberPair(hour % 12 || 12) :
-                    match === "h" ? hour % 12 || 12 :
+                    char0 === "H"    ? zeroPad(hour, match.length) :
+                    char0 === "h"    ? zeroPad(hour % 12 || 12, match.length) :
 
                     // Minute
-                    match === "mm" ? numberPair(minute) :
-                    match === "m" ? minute :
+                    char0 === "m"    ? zeroPad(minute, match.length) :
 
                     // Second
-                    match === "ss" ? numberPair(second) :
-                    match === "s" ? second :
+                    char0 === "s"    ? zeroPad(second, match.length) :
 
                     // AM/PM
-                    match === "tt" ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
-                    match === "t" ? (hour < 12 ? currentCulture._am : currentCulture._pm).charAt(0) :
+                    match === "tt"   ? (hour < 12 ? currentCulture._am : currentCulture._pm) :
+                    char0 === "t"    ? (hour < 12 ? currentCulture._am : currentCulture._pm)[0] :
 
                     // String literal => strip quotation marks
-                    match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
+                    match.substr(1, match.length - 1 - (match[0] != "\\"));
             }
         );
     }
 
     // ***** Public Interface *****
+
+    /**
+     * Formats a string according to a specified formatting string.
+     * @param {string} str The formatting string used to format the additional arguments.
+     * @param {...*} args
+     */
     function sffjs(str, obj0, obj1, obj2) {
-        /// <summary>
-        ///     Formats a string according to a specified formatting string.
-        /// </summary>
-        /// <param name="str">The formatting string used to format the additional arguments.</param>
-        /// <param name="obj0">Object 1</param>
-        /// <param name="obj1">Object 2 [optional]</param>
-        /// <param name="obj2">Object 3 [optional]</param>
         /*jshint unused:false*/
 
         var outerArgs = arguments;
@@ -877,27 +952,29 @@
         }
     };
 
-    /// <field name="version" type="String">The version of the library String.Format for JavaScript.</field>
-    sffjs.version = "1.13.2";
+    /**
+     * The version of the library String.Format for JavaScript.
+     * @type string
+     */
+    sffjs.version = "1.16.0";
 
+    /**
+     * Sets the current culture, used for culture specific formatting.
+     * @param {string} languageCode The IETF language code of the culture, e.g. en-US or en.
+     */
     sffjs.setCulture = function(languageCode) {
-        /// <summary>
-        ///     Sets the current culture, used for culture specific formatting.
-        /// </summary>
-        /// <param name="LCID">The IETF language code of the culture, e.g. en-US or en.</param>
-
         currentCultureId = normalizeCulture(languageCode);
         updateCulture();
     };
 
+    /**
+     * Registers an object containing information about a culture.
+     * @param {*} culture Culture object.
+     */
     sffjs.registerCulture = function(culture) {
-        /// <summary>
-        ///     Registers an object containing information about a culture.
-        /// </summary>
-
         cultures[normalizeCulture(culture.name)] = fillGapsInCulture(culture);
 
-        // ...and reevaulate current culture
+        // ...and reevaluate current culture
         updateCulture();
     };
 
