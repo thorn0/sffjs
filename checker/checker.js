@@ -3,6 +3,7 @@
 "use strict";
 
 var child_process = require('child_process'),
+    process = require('process'),
     path = require('path'),
     fs = require('fs');
 
@@ -10,7 +11,14 @@ var exe = path.join(__dirname, 'checker.exe'),
     src = path.join(__dirname, 'checker.cs');
 
 if (!fs.existsSync(exe)) {
-    child_process.execSync('csc /out:' + JSON.stringify(exe) + ' ' + JSON.stringify(src), { encoding: 'utf8' });
+    var csc = path.join(
+        process.env.WINDIR,
+        'Microsoft.NET',
+        process.arch === 'x64' ? 'Framework64' : 'Framework',
+        'v4.0.30319',
+        'csc.exe'
+    );
+    child_process.execSync(csc + ' /out:' + JSON.stringify(exe) + ' ' + JSON.stringify(src), { encoding: 'utf8' });
 }
 if (!fs.existsSync(exe)) {
     throw new Error('Can\'t find checker.exe');
