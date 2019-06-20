@@ -60,19 +60,15 @@ function unicodeEscape(string) {
 
 function jsonReplacer(key, value) {
     if (typeof value === 'number') {
-        var code;
-        if (value === Infinity) {
-            code = 'Infinity';
-        } else if (value === -Infinity) {
-            code = '-Infinity';
-        } else if (Number.isNaN(value)) {
-            code = 'NaN';
-        }
-        if (code) {
+        // integers (decimal) are needed to test the `X` specifier
+        // TODO: find a cleaner solution
+        var isSafeInteger = value === +parseInt(value) && Math.abs(value) < 1e10;
+        if (!isSafeInteger) {
+            // pass as double
             return {
                 __type: 'special',
                 kind: 'number',
-                value: code
+                value: String(value)
             };
         }
     }
