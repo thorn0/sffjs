@@ -25,10 +25,10 @@
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-build-control": "^0.7.1",
-    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-uglify": "^3.0.0",
-    "load-grunt-tasks": "^3.5.2",
+    "grunt-contrib-uglify": "^4.0.1",
+    "load-grunt-tasks": "^5.0.0",
     "timezoned-date": "^3.0.2"
   },
   "scripts": {

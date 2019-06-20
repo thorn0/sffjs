@@ -32,7 +32,7 @@
 
     if (typeof module !== 'undefined' && module.exports) {
         // CommonJS
-        module.exports = factory();
+        module.exports = factory(true);
     } else if (typeof define === "function" && define.amd) {
         // AMD
         define(factory);
@@ -42,7 +42,7 @@
         global.sffjs.unsafe();
     }
 
-})(this, function() {
+})(this, function(isCommonJsEnv) {
     "use strict";
 
     // ***** Private Variables *****
@@ -155,7 +155,7 @@
     }
 
     var ensureCultureLoaded;
-    if (typeof module !== 'undefined' && module.exports) {
+    if (isCommonJsEnv) {
         ensureCultureLoaded = function(key) {
             if (!(key in cultures)) {
                 cultures[key] = false;

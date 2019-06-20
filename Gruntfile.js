@@ -88,7 +88,13 @@ module.exports = function(grunt) {
                         src: 'cultures/*.js',
                         dest: 'build/'
                     }
-                ]
+                ],
+                options: {
+                    compress: {
+                        pure_getters: true,
+                        passes: 3
+                    }
+                }
             }
         }
     });
