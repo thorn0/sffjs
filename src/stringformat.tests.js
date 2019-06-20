@@ -87,7 +87,7 @@
         assert.doesThrow(function() { String.format("{1}", 42); }, "Missing argument", "Index out of range");
         assert.formatsTo("Negative index:!{-1}!", "Negative index:!{-1}!", 42);
 
-        test.section("Path");
+        test.section("Path", { compatible: false });
         assert.formatsTo("Hi, John!", "Hi, {authors[0].firstname}!", testObject);
         assert.formatsTo("Hi, !", "Hi, {authors[1].firstname}!", testObject);
         assert.formatsTo("Hi, {authors[1]..firstname}!", "Hi, {authors[1]..firstname}!", testObject);
@@ -100,7 +100,7 @@
         assert.formatsTo("1.00", "{authors.length:0.00}", testObject);
         assert.formatsTo("After a comes b.", "After a comes {a}.", testObject);
 
-        test.section("Invalid paths");
+        test.section("Invalid paths", { compatible: false });
         assert.formatsTo("Hi, {fg$}!", "Hi, {fg$}!", undefined);
         assert.formatsTo("Hi, {fg[]}!", "Hi, {fg[]}!", undefined);
         assert.formatsTo("Hi, {fg[-1]}!", "Hi, {fg[-1]}!", undefined);
@@ -343,7 +343,7 @@
         assert.formatsTo("1.01", "{0:f2}", 1.005);
         assert.formatsTo("-1.00", "{0:f2}", -1.0049);
         assert.formatsTo("-1.01", "{0:f2}", -1.005);
-        
+
         test.section("Specifier N");
         assert.formatsTo("1,242.50", "{0:n}", 1242.5);
         assert.formatsTo("1,242.50", "{0:N}", 1242.5);
@@ -361,7 +361,7 @@
         assert.formatsTo("1.594874941e-09", "{0:g}", 0.000000001594874941);
         assert.formatsTo("1242.5", "{0:g}", 1242.5);
         assert.formatsTo("1242.5", "{0:G}", 1242.5);
-        
+
         assert.formatsTo("0", "{0:G}", 0);
         assert.formatsTo("0.0004", "{0:G}", 0.0004);
         assert.formatsTo("4E-05", "{0:G}", 0.00004);
@@ -377,11 +377,11 @@
         assert.formatsTo("159487494155568", "{0:G}", 159487494155568);
         assert.formatsTo("1.59487494155569E+15", "{0:G}", 1594874941555692.0);
         // The last assert will generate different output on .NET depending on
-        // the data type. double will generate a string with the exponential 
+        // the data type. double will generate a string with the exponential
         // notation, and long will generate an expanded number string. JS does
         // not expose different data types for double and long =>
         // we will treat all numbers as doubles.
-        
+
         assert.formatsTo("-1242", "{0:g}", -1242);
         assert.formatsTo("-1242.5", "{0:g}", -1242.5);
         assert.formatsTo("-1242.5", "{0:G}", -1242.5);
@@ -548,9 +548,10 @@
         currentTest = this;
         this.sections = [];
 
-        this.section = function(name) {
+        this.section = function(name, options) {
             t.sections.push({
                 name: name,
+                compatible: !options || !!options.compatible,
                 results: []
             });
         };
@@ -670,6 +671,10 @@
             }
             console.log(String.format("{0} of {1} tests passed", this.numPassedTests, this.numTests));
         };
+
+        this.isCompatibilityCheckEnabled = function() {
+            return t.sections.length === 0 || !!t.sections[t.sections.length - 1].compatible;
+        }
     }
 
     function registerTestResult(message, errorMessage) {
@@ -763,7 +768,7 @@
                 return;
             }
 
-            if (dotNetStringFormat) {
+            if (dotNetStringFormat && currentTest && currentTest.isCompatibilityCheckEnabled()) {
                 var dotNetActual;
                 try {
                     dotNetActual = dotNetStringFormat.apply(null, args);
