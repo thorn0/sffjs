@@ -1,6 +1,17 @@
-﻿# 1.12
+﻿# 1.16
 
-- Update from the upstream (Bug fix: removed infinity loop when using the G format specifier with a zero value.)
+- Fix: format strings like `%yy` were interpreted as `yy` whereas .NET interprets it as `y""y`
+- Updates from upstream (rounding/precision issues; custom date/time specifiers: `y`, `yyy`, `yyyy`, `yyyyy`)
+
+# 1.13
+
+- Support single custom date/time format specifiers: `{0:%h}`
+- Support custom date/time specifiers: offset (`z`, `zz`, `zzz`), fractional seconds (`f`, `FF`, etc.)
+- Update from the upstream (fix: midnight and noon was incorrectly formatted when using 12-hour clock)
+
+# 1.12
+
+- Update from the upstream (fix: removed infinity loop when using the G format specifier with a zero value.)
 
 # 1.11
 
