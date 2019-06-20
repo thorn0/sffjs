@@ -230,6 +230,15 @@
         assert.formatsTo("04/02/1989 06:20:33.00900 PM", "{0:MM/dd/yyyy hh:mm:ss.fffff tt}", dtms9);
         assert.formatsTo("04/02/1989 06:20:33.009000 PM", "{0:MM/dd/yyyy hh:mm:ss.ffffff tt}", dtms9);
         assert.formatsTo("04/02/1989 06:20:33.0090000 PM", "{0:MM/dd/yyyy hh:mm:ss.fffffff tt}", dtms9);
+        var dtpm1 = new Date(1989, 3, 2, 18, 20, 33, 123);
+        assert.formatsTo("00 ", "{0:ff} {0:FF}", new Date(1901, 0, 1));
+        assert.formatsTo("1 1", "{0:%f} {0:%F}", dtpm1);
+        assert.formatsTo("12 12", "{0:ff} {0:FF}", dtpm1);
+        assert.formatsTo("123 123", "{0:fff} {0:FFF}", dtpm1);
+        assert.formatsTo("1230 123", "{0:ffff} {0:FFFF}", dtpm1);
+        assert.formatsTo("12300 123", "{0:fffff} {0:FFFFF}", dtpm1);
+        assert.formatsTo("123000 123", "{0:ffffff} {0:FFFFFF}", dtpm1);
+        assert.formatsTo("1230000 123", "{0:fffffff} {0:FFFFFFF}", dtpm1);
 
         test.section("Offset from UTC");
         assert.formatsTo("04/02/1989 06:20:33.000+3 PM", "{0:MM/dd/yyyy hh:mm:ss.fffz tt}", dtpm);
@@ -243,6 +252,12 @@
         assert.formatsTo("07/05/2007 04:03:02.001-2 AM", "{0:MM/dd/yyyy hh:mm:ss.fffz tt}", dtminus);
         assert.formatsTo("07/05/2007 04:03:02.001-02 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzz tt}", dtminus);
         assert.formatsTo("07/05/2007 04:03:02.001-02:30 AM", "{0:MM/dd/yyyy hh:mm:ss.fffzzz tt}", dtminus);
+        var negativeTimeZoneOffset = new (timezonedDate.makeConstructor(-90))(1901, 0, 1);
+        var zeroTimeZoneOffset = new (timezonedDate.makeConstructor(0))(1901, 0, 1);
+        var positiveTimeZoneOffset = new (timezonedDate.makeConstructor(90))(1901, 0, 1);
+        assert.formatsTo("-1 -01 -01:30", "{0:%z} {0:zz} {0:zzz}", negativeTimeZoneOffset);
+        assert.formatsTo("+0 +00 +00:00", "{0:%z} {0:zz} {0:zzz}", zeroTimeZoneOffset);
+        assert.formatsTo("+1 +01 +01:30", "{0:%z} {0:zz} {0:zzz}", positiveTimeZoneOffset);
 
         test.section("Single custom format specifiers");
         assert.formatsTo("6", "{0:%h}", dtpm);
@@ -429,6 +444,10 @@
 
         assert.formatsTo("12.5 %", "{0:p1}", 0.12549);
         assert.formatsTo("12.5 %", "{0:P1}", 0.12549);
+
+        assert.formatsTo("191.24 %", "{0:p}", 1.912421);
+        assert.formatsTo("191 %", "{0:p0}", 1.912421);
+        assert.formatsTo("191.2421000000 %", "{0:p10}", 1.912421);
 
         test.section("Specifier R");
         assert.formatsTo("2353", "{0:R}", 2353);
