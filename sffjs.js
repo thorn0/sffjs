@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript, version 1.16.0
+ * String.format for JavaScript, version 1.16.1
  *
  * Copyright (c) 2009-2019 Daniel Mester Pirttijärvi
  * https://github.com/dmester/sffjs
@@ -238,7 +238,9 @@
             result = ensureFixedPoint(Number(result + "1").toFixed(decimals));
 
             // Trim excessive decimal zeroes
-            result = result.replace(/\.?0+$/, "");
+            if (decimals > 0) {
+                result = result.replace(/\.?0+$/, "");
+            }
         }
 
         return result;
@@ -956,7 +958,7 @@
      * The version of the library String.Format for JavaScript.
      * @type string
      */
-    sffjs.version = "1.16.0";
+    sffjs.version = "1.16.1";
 
     /**
      * Sets the current culture, used for culture specific formatting.
