@@ -1,6 +1,6 @@
 {
   "name": "sffjs",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "String.Format for JavaScript",
   "main": "sffjs.js",
   "repository": {

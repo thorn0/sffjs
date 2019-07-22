@@ -1,4 +1,8 @@
-﻿# 1.16
+﻿# 1.16.1
+
+- Fix: decimal zeroes were trimmed incorrectly (`0.3012` was formatted as `3%`)
+
+# 1.16
 
 - Fix: format strings like `%yy` were interpreted as `yy` whereas .NET interprets it as `y""y`
 - Updates from upstream (rounding/precision issues; custom date/time specifiers: `y`, `yyy`, `yyyy`, `yyyyy`)
