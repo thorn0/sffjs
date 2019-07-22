@@ -324,6 +324,11 @@
         assert.formatsTo("4%", "{0:0'%'}", 4.2);
         assert.formatsTo("4%", "{0:0\\%}", 4.2);
         assert.formatsTo("42.01%", "{0:0.00%}", 0.42009);
+        assert.formatsTo("30%", "{0:#,#%}", 0.3);
+        assert.formatsTo("30%", "{0:#,#%}", 0.3012);
+        assert.formatsTo("31%", "{0:#,#%}", 0.3123);
+        assert.formatsTo("30%", "{0:0,0%}", 0.30345)
+        assert.formatsTo("03%", "{0:0,0%}", 0.030345)
 
         test.section("Custom numeric format strings - thousands separator and scaling");
         assert.formatsTo("4200", "{0:,0,}", 4200000);
@@ -448,6 +453,10 @@
         assert.formatsTo("191.24 %", "{0:p}", 1.912421);
         assert.formatsTo("191 %", "{0:p0}", 1.912421);
         assert.formatsTo("191.2421000000 %", "{0:p10}", 1.912421);
+
+        assert.formatsTo("30 %", "{0:p0}", 0.3);
+        assert.formatsTo("30 %", "{0:p0}", 0.301);
+        assert.formatsTo("30 %", "{0:p0}", 0.3012);
 
         test.section("Specifier R");
         assert.formatsTo("2353", "{0:R}", 2353);
