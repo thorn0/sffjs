@@ -164,7 +164,7 @@
     }
 
     var ensureCultureLoaded;
-    if (isCommonJsEnv) {
+    if (isCommonJsEnv === true) {
         ensureCultureLoaded = function(key) {
             if (!(key in cultures)) {
                 cultures[key] = false;
