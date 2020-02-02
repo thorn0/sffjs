@@ -1,5 +1,5 @@
 /**
- * String.format for JavaScript, version 1.16.1
+ * String.format for JavaScript, version 1.16.2
  *
  * Copyright (c) 2009-2019 Daniel Mester Pirttijärvi
  * https://github.com/dmester/sffjs
@@ -164,7 +164,7 @@
     }
 
     var ensureCultureLoaded;
-    if (isCommonJsEnv) {
+    if (isCommonJsEnv === true) {
         ensureCultureLoaded = function(key) {
             if (!(key in cultures)) {
                 cultures[key] = false;
@@ -958,7 +958,7 @@
      * The version of the library String.Format for JavaScript.
      * @type string
      */
-    sffjs.version = "1.16.1";
+    sffjs.version = "1.16.2";
 
     /**
      * Sets the current culture, used for culture specific formatting.
