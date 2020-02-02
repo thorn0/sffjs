@@ -1,4 +1,8 @@
-﻿# 1.16.1
+﻿# 1.16.2
+
+- Fix: usage with AMD/RequireJS was broken ([#6](https://github.com/thorn0/sffjs/pull/6) by [@MakullaMa](https://github.com/MakullaMa))
+
+# 1.16.1
 
 - Fix: decimal zeroes were trimmed incorrectly (`0.3012` was formatted as `3%`)
 
